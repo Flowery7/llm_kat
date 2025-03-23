@@ -269,8 +269,7 @@ async function sendMessage() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: "mistralai/mistral-7b-instruct",
-        messages: [{ role: "user", content: userInput.value }],
+        choices: [{ message: { content: userInput.value } }]
       }),
     });
 
@@ -319,6 +318,7 @@ async function sendMessage() {
   userInput.value = '';
   chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll
 }
+
 
 // Event listeners
 document.getElementById('send-btn').addEventListener('click', sendMessage);
