@@ -244,15 +244,15 @@
    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
 
 <script>
-  // Function to send a message
- // Function to send a message
+// Function to send a message
 async function sendMessage() {
   const userInput = document.getElementById('user-input');
   const chatBox = document.getElementById('chat-box');
 
+  // Don't proceed if the input is empty
   if (userInput.value.trim() === '') return;
 
-  // Append user message
+  // Append the user's message to the chat
   const userMessage = document.createElement('div');
   userMessage.classList.add('message', 'user-message');
   userMessage.textContent = userInput.value;
@@ -274,6 +274,7 @@ async function sendMessage() {
       }),
     });
 
+    // Parse the response
     const data = await response.json();
     console.log("API Response:", data); // Debugging: Log the API response
 
@@ -297,6 +298,7 @@ async function sendMessage() {
       const textNode = document.createTextNode(data.choices[0].message.content);
       botMessage.appendChild(textNode);
 
+      // Append the bot message to chat
       chatBox.appendChild(botMessage);
     } else {
       throw new Error("Invalid API response structure");
@@ -400,5 +402,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
+
 </body>
 </html>
