@@ -244,21 +244,18 @@
    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
 
 <script>
-// Function to send a message
 async function sendMessage() {
   const userInput = document.getElementById('user-input');
   const chatBox = document.getElementById('chat-box');
+  const selectedModel = document.getElementById('model-select').value;
 
-  // Don't proceed if the input is empty
   if (userInput.value.trim() === '') return;
 
-  // Append the user's message to the chat
   const userMessage = document.createElement('div');
   userMessage.classList.add('message', 'user-message');
   userMessage.textContent = userInput.value;
   chatBox.appendChild(userMessage);
 
-  // Disable input and send button while processing
   userInput.disabled = true;
   document.getElementById('send-btn').disabled = true;
 
@@ -268,37 +265,30 @@ async function sendMessage() {
       headers: {
         'Content-Type': 'application/json',
       },
-     body: JSON.stringify({
-  prompt: userInput.value
-}),
-
+      body: JSON.stringify({
+        prompt: userInput.value,
+        model: selectedModel
+      }),
     });
 
-    // Parse the response
     const data = await response.json();
-    console.log("API Response:", data); // Debugging: Log the API response
+    console.log("API Response:", data);
 
-    // Check if the response contains an error
     if (data.error) {
       throw new Error(data.error.message || "API returned an error");
     }
 
-    // Check if the response contains the expected data
     if (data.choices && data.choices[0] && data.choices[0].message) {
       const botMessage = document.createElement('div');
       botMessage.classList.add('message', 'bot-message');
 
-      // Add bot image icon
       const img = document.createElement('img');
-      img.src = 'Kat-image-speech.png'; // Ensure correct path
+      img.src = 'Kat-image-speech.png';
       img.alt = 'Bot Icon';
       botMessage.appendChild(img);
 
-      // Add bot response text
       const textNode = document.createTextNode(data.choices[0].message.content);
       botMessage.appendChild(textNode);
-
-      // Append the bot message to chat
       chatBox.appendChild(botMessage);
     } else {
       throw new Error("Invalid API response structure");
@@ -310,98 +300,14 @@ async function sendMessage() {
     botMessage.textContent = `Error: ${error.message}`;
     chatBox.appendChild(botMessage);
   } finally {
-    // Re-enable input and send button
     userInput.disabled = false;
     document.getElementById('send-btn').disabled = false;
   }
 
-  // Clear input and scroll to the bottom
   userInput.value = '';
-  chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll
+  chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-
-// Event listeners
-document.getElementById('send-btn').addEventListener('click', sendMessage);
-document.getElementById('user-input').addEventListener('keypress', function (e) {
-  if (e.key === 'Enter') {
-    sendMessage();
-  }
-});
-
-// Placeholder functions for new buttons
-document.getElementById('speak-btn').addEventListener('click', function () {
-  alert('Speak functionality will be implemented here.');
-});
-
-document.getElementById('ai-speak-btn').addEventListener('click', function () {
-  alert('AI to Speak functionality will be implemented here.');
-});
-
-// Save button functionality
-document.getElementById('save-btn').addEventListener('click', function () {
-  const chatBox = document.getElementById('chat-box').innerHTML;
-  localStorage.setItem('chatHistory', chatBox);
-  alert('Chat saved successfully!');
-});
-
-// Reset button functionality (clears chat without confirmation)
-document.getElementById('reset-btn').addEventListener('click', function () {
-  document.getElementById('chat-box').innerHTML = ''; // Clears chat
-  localStorage.removeItem('chatHistory'); // Removes saved chat from localStorage
-});
-
-// Load saved chat history on page load
-document.addEventListener('DOMContentLoaded', () => {
-  const chatBox = document.getElementById('chat-box');
-  const savedChat = localStorage.getItem('chatHistory');
-  if (savedChat) {
-    chatBox.innerHTML = savedChat;
-  }
-
-  // Scroll bar functionality
-  const scrollBar = document.getElementById('scroll-bar');
-
-  function updateScrollBar() {
-    let chatHeight = chatBox.scrollHeight;
-    let visibleHeight = chatBox.clientHeight;
-    let scrollRatio = visibleHeight / chatHeight;
-
-    scrollBar.style.height = `${scrollRatio * visibleHeight * 0.8}px`;
-    scrollBar.style.top = `${(chatBox.scrollTop / chatHeight) * visibleHeight}px`;
-  }
-
-  chatBox.addEventListener('scroll', updateScrollBar);
-  updateScrollBar(); // Set scrollbar size on load
-
-  let isDragging = false;
-  let startY, startScrollTop;
-
-  scrollBar.addEventListener('mousedown', (e) => {
-    isDragging = true;
-    startY = e.clientY;
-    startScrollTop = chatBox.scrollTop;
-    scrollBar.style.opacity = '1';
-    document.body.style.userSelect = 'none'; // Prevent text selection
-  });
-
-  document.addEventListener('mousemove', (e) => {
-    if (!isDragging) return;
-    let deltaY = e.clientY - startY;
-    let chatHeight = chatBox.scrollHeight;
-    let visibleHeight = chatBox.clientHeight;
-    let scrollRatio = chatHeight / visibleHeight;
-
-    chatBox.scrollTop = startScrollTop + deltaY * scrollRatio;
-    updateScrollBar();
-  });
-
-  document.addEventListener('mouseup', () => {
-    isDragging = false;
-    scrollBar.style.opacity = '0.8';
-    document.body.style.userSelect = ''; // Restore text selection
-  });
-});
 </script>
 
 </body>
