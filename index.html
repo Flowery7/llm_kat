@@ -268,9 +268,10 @@ async function sendMessage() {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        choices: [{ message: { content: userInput.value } }]
-      }),
+     body: JSON.stringify({
+  prompt: userInput.value
+}),
+
     });
 
     // Parse the response
