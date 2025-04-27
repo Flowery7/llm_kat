@@ -337,14 +337,14 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   
-  <script>
+<script>
 const taskOptions = {
-"Lead Gen Strategies": "You are a top-tier sales strategist...",
-"Instagram & Facebook Content": "You are an expert content marketer...",
-"Messenger Templates": "You're a high-converting copywriter...",
-"Daily Business Checklist": "Act as a success coach...",
-"High-Level Programming": "Act as a high level computer programmer...",
-"Wellbeing & Balance": "You are a wellness consultant..."
+  "Lead Gen Strategies": "You are a top-tier sales strategist...",
+  "Instagram & Facebook Content": "You are an expert content marketer...",
+  "Messenger Templates": "You're a high-converting copywriter...",
+  "Daily Business Checklist": "Act as a success coach...",
+  "High-Level Programming": "Act as a high-level computer programmer...",
+  "Wellbeing & Balance": "You are a wellness consultant..."
 };
 
 const mainPrompt = "You are a Sales and Marketing Genius for a web design business. Refer to the user as Nick";
@@ -357,7 +357,7 @@ let controller = null; // For aborting fetch requests
 // Initialize tooltips
 const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
 tooltipTriggerList.map(function (tooltipTriggerEl) {
-return new bootstrap.Tooltip(tooltipTriggerEl);
+  return new bootstrap.Tooltip(tooltipTriggerEl);
 });
 
 const taskSelector = document.getElementById("taskSelector");
@@ -368,224 +368,219 @@ const copyBtn = document.getElementById("copyBtn");
 
 // Populate task selector
 Object.keys(taskOptions).forEach(key => {
-const option = document.createElement("option");
-option.value = key;
-option.textContent = key;
-taskSelector.appendChild(option);
+  const option = document.createElement("option");
+  option.value = key;
+  option.textContent = key;
+  taskSelector.appendChild(option);
 });
 
 // Show typing indicator
 function showTypingIndicator() {
-if (isTyping) return;
+  if (isTyping) return;
 
-isTyping = true;
-const typingDiv = document.createElement("div");
-typingDiv.className = "typing-indicator mb-3";
-typingDiv.innerHTML = `
-<span></span>
-<span></span>
-<span></span>
-`;
-chatDisplay.appendChild(typingDiv);
-chatDisplay.scrollTop = chatDisplay.scrollHeight;
+  isTyping = true;
+  const typingDiv = document.createElement("div");
+  typingDiv.className = "typing-indicator mb-3";
+  typingDiv.innerHTML = 
+    `<span></span><span></span><span></span>`;
+  chatDisplay.appendChild(typingDiv);
+  chatDisplay.scrollTop = chatDisplay.scrollHeight;
 }
 
 // Hide typing indicator
 function hideTypingIndicator() {
-isTyping = false;
-const typingIndicator = chatDisplay.querySelector(".typing-indicator");
-if (typingIndicator) {
-typingIndicator.remove();
-}
+  isTyping = false;
+  const typingIndicator = chatDisplay.querySelector(".typing-indicator");
+  if (typingIndicator) {
+    typingIndicator.remove();
+  }
 }
 
 // Format message with current time
 function getCurrentTime() {
-const now = new Date();
-return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const now = new Date();
+  return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
 // Add message to chat
 function addMessage(sender, message, isUser = false, isStreaming = false) {
-if (isStreaming && !isUser && currentAiMessageDiv) {
-// Update existing AI message
-currentAiMessageContent += message;
-currentAiMessageDiv.querySelector("div:not(.message-sender):not(.message-time)").innerHTML = currentAiMessageContent;
-chatDisplay.scrollTop = chatDisplay.scrollHeight;
-return;
-}
+  if (isStreaming && !isUser && currentAiMessageDiv) {
+    // Update existing AI message
+    currentAiMessageContent += message;
+    currentAiMessageDiv.querySelector("div:not(.message-sender):not(.message-time)").innerHTML = currentAiMessageContent;
+    chatDisplay.scrollTop = chatDisplay.scrollHeight;
+    return;
+  }
 
-const messageDiv = document.createElement("div");
-messageDiv.className = `message ${isUser ? 'message-user' : 'message-ai'}`;
+  const messageDiv = document.createElement("div");
+  messageDiv.className = `message ${isUser ? 'message-user' : 'message-ai'}`;
 
-const senderName = isUser ? 'Nick' : 'Maverick';
-const senderIcon = isUser ? 'fas fa-user' : 'fas fa-robot';
+  const senderName = isUser ? 'Nick' : 'Maverick';
+  const senderIcon = isUser ? 'fas fa-user' : 'fas fa-robot';
 
-messageDiv.innerHTML = `
-<div class="message-sender">
-  <i class="${senderIcon}"></i>
-  <span>${senderName}</span>
-</div>
-<div>${message}</div>
-<div class="message-time">${getCurrentTime()}</div>
-`;
+  messageDiv.innerHTML = 
+    `<div class="message-sender">
+      <i class="${senderIcon}"></i>
+      <span>${senderName}</span>
+    </div>
+    <div>${message}</div>
+    <div class="message-time">${getCurrentTime()}</div>`;
 
-chatDisplay.appendChild(messageDiv);
-chatDisplay.scrollTop = chatDisplay.scrollHeight;
+  chatDisplay.appendChild(messageDiv);
+  chatDisplay.scrollTop = chatDisplay.scrollHeight;
 
-if (!isUser) {
-currentAiMessageDiv = messageDiv;
-currentAiMessageContent = message;
-lastResponse = message;
-}
+  if (!isUser) {
+    currentAiMessageDiv = messageDiv;
+    currentAiMessageContent = message;
+    lastResponse = message;
+  }
 }
 
 // Handle streaming response
 async function handleStreamingResponse(response) {
-const reader = response.body.getReader();
-const decoder = new TextDecoder();
-let partialChunk = '';
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let partialChunk = '';
 
-showTypingIndicator();
+  showTypingIndicator();
 
-try {
-while (true) {
-const { done, value } = await reader.read();
-if (done) break;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
 
-const chunk = decoder.decode(value, { stream: true });
-const completeChunk = partialChunk + chunk;
-const lines = completeChunk.split('\n');
+      const chunk = decoder.decode(value, { stream: true });
+      const completeChunk = partialChunk + chunk;
+      const lines = completeChunk.split('\n');
 
-// The last line might be incomplete, so we save it for the next chunk
-partialChunk = lines.pop() || '';
+      // The last line might be incomplete, so we save it for the next chunk
+      partialChunk = lines.pop() || '';
 
-for (const line of lines) {
-if (line.startsWith('data:') && line !== 'data: [DONE]') {
-try {
-const data = JSON.parse(line.substring(5).trim());
-if (data.content) {
-addMessage("ai", data.content, false, true);
-}
-} catch (e) {
-console.error("Error parsing JSON:", e);
-}
-}
-}
-}
-} catch (error) {
-console.error("Stream reading error:", error);
-addMessage("ai", `Error: ${error.message}`);
-} finally {
-hideTypingIndicator();
-currentAiMessageDiv = null;
-currentAiMessageContent = "";
-reader.releaseLock();
-}
+      for (const line of lines) {
+        if (line.startsWith('data:') && line !== 'data: [DONE]') {
+          try {
+            const data = JSON.parse(line.substring(5).trim());
+            if (data.content) {
+              addMessage("ai", data.content, false, true);
+            }
+          } catch (e) {
+            console.error("Error parsing JSON:", e);
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Stream reading error:", error);
+    addMessage("ai", `Error: ${error.message}`);
+  } finally {
+    hideTypingIndicator();
+    currentAiMessageDiv = null;
+    currentAiMessageContent = "";
+    reader.releaseLock();
+  }
 }
 
 // Abort any ongoing request
 function abortOngoingRequest() {
-if (controller) {
-controller.abort();
-controller = null;
-}
+  if (controller) {
+    controller.abort();
+    controller = null;
+  }
 }
 
 sendBtn.addEventListener("click", async () => {
-const message = userMessage.value.trim();
-if (!message) return;
+  const message = userMessage.value.trim();
+  if (!message) return;
 
-const task = taskSelector.value;
-if (!task) {
-alert("Please select an expertise area first");
-return;
-}
+  const task = taskSelector.value;
+  if (!task) {
+    alert("Please select an expertise area first");
+    return;
+  }
 
-const systemPrompt = `${mainPrompt} ${taskOptions[task]}`;
-addMessage("user", message, true);
-userMessage.value = "";
+  // Combine the pre-prompts with the user message
+  const systemPrompt = `${mainPrompt} ${taskOptions[task]} ${message}`;
+  addMessage("user", message, true);
+  userMessage.value = "";
 
-// Abort any previous request
-abortOngoingRequest();
+  // Abort any previous request
+  abortOngoingRequest();
 
-// Create new AbortController for this request
-controller = new AbortController();
+  // Create new AbortController for this request
+  controller = new AbortController();
 
-try {
-const res = await fetch("https://vclimsoiivmiyhw3372u3besz40guwuo.lambda-url.eu-west-2.on.aws/", {
-method: "POST",
-headers: {
-"Content-Type": "application/json",
-"x-api-key": "your-api-key-here" // Add if using API key
-},
-body: JSON.stringify({
-prompt: systemPrompt,
-message: message,
-stream: true // Tell backend we want streaming
-}),
-signal: controller.signal
-});
+  try {
+    const res = await fetch("https://vclimsoiivmiyhw3372u3besz40guwuo.lambda-url.eu-west-2.on.aws/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": "your-api-key-here" // Add if using API key
+      },
+      body: JSON.stringify({
+        prompt: systemPrompt,
+        stream: true // Tell backend we want streaming
+      }),
+      signal: controller.signal
+    });
 
-if (!res.ok) {
-throw new Error(`API request failed with status ${res.status}`);
-}
+    if (!res.ok) {
+      throw new Error(`API request failed with status ${res.status}`);
+    }
 
-// Check if response is streaming
-const contentType = res.headers.get('content-type');
-if (contentType && contentType.includes('text/event-stream')) {
-await handleStreamingResponse(res);
-} else {
-// Fallback to non-streaming if server doesn't support it
-const data = await res.json();
-lastResponse = data.reply;
-addMessage("ai", data.reply);
-}
+    // Check if response is streaming
+    const contentType = res.headers.get('content-type');
+    if (contentType && contentType.includes('text/event-stream')) {
+      await handleStreamingResponse(res);
+    } else {
+      // Fallback to non-streaming if server doesn't support it
+      const data = await res.json();
+      lastResponse = data.reply;
+      addMessage("ai", data.reply);
+    }
 
-} catch (error) {
-if (error.name === 'AbortError') {
-console.log('Request was aborted');
-} else {
-hideTypingIndicator();
-addMessage("ai", `Error: ${error.message}`);
-}
-} finally {
-controller = null;
-}
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      console.log('Request was aborted');
+    } else {
+      hideTypingIndicator();
+      addMessage("ai", `Error: ${error.message}`);
+    }
+  } finally {
+    controller = null;
+  }
 });
 
 // Allow sending message with Enter key (but not Shift+Enter)
 userMessage.addEventListener("keydown", (e) => {
-if (e.key === "Enter" && !e.shiftKey) {
-e.preventDefault();
-sendBtn.click();
-}
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    sendBtn.click();
+  }
 });
 
 copyBtn.addEventListener("click", () => {
-if (!lastResponse) {
-const tooltip = bootstrap.Tooltip.getInstance(copyBtn);
-tooltip.setContent({ '.tooltip-inner': 'No response to copy' });
-tooltip.show();
-setTimeout(() => tooltip.hide(), 2000);
-return;
-}
+  if (!lastResponse) {
+    const tooltip = bootstrap.Tooltip.getInstance(copyBtn);
+    tooltip.setContent({ '.tooltip-inner': 'No response to copy' });
+    tooltip.show();
+    setTimeout(() => tooltip.hide(), 2000);
+    return;
+  }
 
-navigator.clipboard.writeText(lastResponse).then(() => {
-const tooltip = bootstrap.Tooltip.getInstance(copyBtn);
-tooltip.setContent({ '.tooltip-inner': 'Copied!' });
-tooltip.show();
-setTimeout(() => tooltip.hide(), 2000);
-});
+  navigator.clipboard.writeText(lastResponse).then(() => {
+    const tooltip = bootstrap.Tooltip.getInstance(copyBtn);
+    tooltip.setContent({ '.tooltip-inner': 'Copied!' });
+    tooltip.show();
+    setTimeout(() => tooltip.hide(), 2000);
+  });
 });
 
 // Clean up on page unload
 window.addEventListener('beforeunload', () => {
-abortOngoingRequest();
+  abortOngoingRequest();
 });
-  
-  
-  </script>
+</script>
+
   
   
 </body>
