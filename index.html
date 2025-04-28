@@ -486,8 +486,8 @@ sendBtn.addEventListener("click", async () => {
     return;
   }
 
-  // Combine main prompt + task-specific prompt + user's message
-  const combinedMessage = `${mainPrompt} ${taskOptions[task]} ${message}`;
+  // Combine main prompt + task-specific prompt to form the system prompt
+  const systemPrompt = `${mainPrompt} ${taskOptions[task]}`;
 
   addMessage("user", message, true);
   userMessage.value = "";
@@ -502,7 +502,8 @@ sendBtn.addEventListener("click", async () => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        message: combinedMessage,
+        prompt: systemPrompt,  // This is the system/instruction prompt
+        message: message,      // This is the user's message
         stream: true
       }),
       signal: controller.signal
