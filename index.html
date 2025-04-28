@@ -395,14 +395,7 @@ function getCurrentTime() {
   return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
-function addMessage(sender, message, isUser = false, isStreaming = false) {
-  if (isStreaming && !isUser && currentAiMessageDiv) {
-    currentAiMessageContent += message;
-    currentAiMessageDiv.querySelector("div:not(.message-sender):not(.message-time)").innerHTML = currentAiMessageContent;
-    chatDisplay.scrollTop = chatDisplay.scrollHeight;
-    return;
-  }
-
+function addMessage(sender, message, isUser = false) {
   const messageDiv = document.createElement("div");
   messageDiv.className = `message ${isUser ? 'message-user' : 'message-ai'}`;
 
@@ -421,51 +414,7 @@ function addMessage(sender, message, isUser = false, isStreaming = false) {
   chatDisplay.scrollTop = chatDisplay.scrollHeight;
 
   if (!isUser) {
-    currentAiMessageDiv = messageDiv;
-    currentAiMessageContent = message;
     lastResponse = message;
-  }
-}
-
-async function handleStreamingResponse(response) {
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  let partialChunk = '';
-
-  showTypingIndicator();
-
-  try {
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      const chunk = decoder.decode(value, { stream: true });
-      const completeChunk = partialChunk + chunk;
-      const lines = completeChunk.split('\n');
-
-      partialChunk = lines.pop() || '';
-
-      for (const line of lines) {
-        if (line.startsWith('data:') && line !== 'data: [DONE]') {
-          try {
-            const data = JSON.parse(line.substring(5).trim());
-            if (data.content) {
-              addMessage("ai", data.content, false, true);
-            }
-          } catch (e) {
-            console.error("Error parsing JSON:", e);
-          }
-        }
-      }
-    }
-  } catch (error) {
-    console.error("Stream reading error:", error);
-    addMessage("ai", `Error: ${error.message}`);
-  } finally {
-    hideTypingIndicator();
-    currentAiMessageDiv = null;
-    currentAiMessageContent = "";
-    reader.releaseLock();
   }
 }
 
@@ -495,41 +444,46 @@ sendBtn.addEventListener("click", async () => {
   abortOngoingRequest();
   controller = new AbortController();
 
+  showTypingIndicator();
+
   try {
+    const payload = {
+      prompt: systemPrompt,
+      message: message,
+      stream: false  // Force stream to false
+    };
+
+    console.log("Sending payload:", payload); // Debug log
+
     const res = await fetch("https://vclimsoiivmiyhw3372u3besz40guwuo.lambda-url.eu-west-2.on.aws/", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Accept": "application/json"
       },
-      body: JSON.stringify({
-        prompt: systemPrompt,  // This is the system/instruction prompt
-        message: message,      // This is the user's message
-        stream: true
-      }),
+      body: JSON.stringify(payload),
       signal: controller.signal
     });
 
     if (!res.ok) {
-      throw new Error(`API request failed with status ${res.status}`);
+      const errorBody = await res.text();
+      console.error("Server error:", errorBody);
+      throw new Error(`HTTP ${res.status}: ${errorBody}`);
     }
 
-    const contentType = res.headers.get('content-type');
-    if (contentType && contentType.includes('text/event-stream')) {
-      await handleStreamingResponse(res);
-    } else {
-      const data = await res.json();
-      lastResponse = data.reply;
-      addMessage("ai", data.reply);
-    }
+    const data = await res.json();
+    lastResponse = data.reply;
+    addMessage("ai", data.reply);
 
   } catch (error) {
     if (error.name === 'AbortError') {
       console.log('Request was aborted');
     } else {
-      hideTypingIndicator();
+      console.error("Fetch error:", error);
       addMessage("ai", `Error: ${error.message}`);
     }
   } finally {
+    hideTypingIndicator();
     controller = null;
   }
 });
@@ -562,7 +516,6 @@ window.addEventListener('beforeunload', () => {
   abortOngoingRequest();
 });
 </script>
-
 
   
   
