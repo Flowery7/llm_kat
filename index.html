@@ -352,7 +352,7 @@ let lastResponse = "";
 let isTyping = false;
 let currentAiMessageDiv = null;
 let currentAiMessageContent = "";
-let controller = null; // For aborting fetch requests
+let controller = null;
 
 // Initialize tooltips
 const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
@@ -374,38 +374,29 @@ Object.keys(taskOptions).forEach(key => {
   taskSelector.appendChild(option);
 });
 
-// Show typing indicator
 function showTypingIndicator() {
   if (isTyping) return;
-
   isTyping = true;
   const typingDiv = document.createElement("div");
   typingDiv.className = "typing-indicator mb-3";
-  typingDiv.innerHTML = 
-    `<span></span><span></span><span></span>`;
+  typingDiv.innerHTML = `<span></span><span></span><span></span>`;
   chatDisplay.appendChild(typingDiv);
   chatDisplay.scrollTop = chatDisplay.scrollHeight;
 }
 
-// Hide typing indicator
 function hideTypingIndicator() {
   isTyping = false;
   const typingIndicator = chatDisplay.querySelector(".typing-indicator");
-  if (typingIndicator) {
-    typingIndicator.remove();
-  }
+  if (typingIndicator) typingIndicator.remove();
 }
 
-// Format message with current time
 function getCurrentTime() {
   const now = new Date();
   return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
-// Add message to chat
 function addMessage(sender, message, isUser = false, isStreaming = false) {
   if (isStreaming && !isUser && currentAiMessageDiv) {
-    // Update existing AI message
     currentAiMessageContent += message;
     currentAiMessageDiv.querySelector("div:not(.message-sender):not(.message-time)").innerHTML = currentAiMessageContent;
     chatDisplay.scrollTop = chatDisplay.scrollHeight;
@@ -418,8 +409,8 @@ function addMessage(sender, message, isUser = false, isStreaming = false) {
   const senderName = isUser ? 'Nick' : 'Maverick';
   const senderIcon = isUser ? 'fas fa-user' : 'fas fa-robot';
 
-  messageDiv.innerHTML = 
-    `<div class="message-sender">
+  messageDiv.innerHTML = `
+    <div class="message-sender">
       <i class="${senderIcon}"></i>
       <span>${senderName}</span>
     </div>
@@ -436,7 +427,6 @@ function addMessage(sender, message, isUser = false, isStreaming = false) {
   }
 }
 
-// Handle streaming response
 async function handleStreamingResponse(response) {
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
@@ -453,7 +443,6 @@ async function handleStreamingResponse(response) {
       const completeChunk = partialChunk + chunk;
       const lines = completeChunk.split('\n');
 
-      // The last line might be incomplete, so we save it for the next chunk
       partialChunk = lines.pop() || '';
 
       for (const line of lines) {
@@ -480,7 +469,6 @@ async function handleStreamingResponse(response) {
   }
 }
 
-// Abort any ongoing request
 function abortOngoingRequest() {
   if (controller) {
     controller.abort();
@@ -498,27 +486,24 @@ sendBtn.addEventListener("click", async () => {
     return;
   }
 
-  // Combine the pre-prompts with the user message
-  const systemPrompt = `${mainPrompt} ${taskOptions[task]} ${message}`;
+  // Combine main prompt + task-specific prompt + user's message
+  const combinedMessage = `${mainPrompt} ${taskOptions[task]} ${message}`;
+
   addMessage("user", message, true);
   userMessage.value = "";
 
-  // Abort any previous request
   abortOngoingRequest();
-
-  // Create new AbortController for this request
   controller = new AbortController();
 
   try {
     const res = await fetch("https://vclimsoiivmiyhw3372u3besz40guwuo.lambda-url.eu-west-2.on.aws/", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-         
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        prompt: systemPrompt,
-        stream: true // Tell backend we want streaming
+        message: combinedMessage,
+        stream: true
       }),
       signal: controller.signal
     });
@@ -527,12 +512,10 @@ sendBtn.addEventListener("click", async () => {
       throw new Error(`API request failed with status ${res.status}`);
     }
 
-    // Check if response is streaming
     const contentType = res.headers.get('content-type');
     if (contentType && contentType.includes('text/event-stream')) {
       await handleStreamingResponse(res);
     } else {
-      // Fallback to non-streaming if server doesn't support it
       const data = await res.json();
       lastResponse = data.reply;
       addMessage("ai", data.reply);
@@ -550,7 +533,6 @@ sendBtn.addEventListener("click", async () => {
   }
 });
 
-// Allow sending message with Enter key (but not Shift+Enter)
 userMessage.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
@@ -575,11 +557,11 @@ copyBtn.addEventListener("click", () => {
   });
 });
 
-// Clean up on page unload
 window.addEventListener('beforeunload', () => {
   abortOngoingRequest();
 });
 </script>
+
 
   
   
