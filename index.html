@@ -26,6 +26,7 @@
       min-height: 100vh;
       padding: 1rem;
       color: var(--dark);
+      overflow: hidden;
     }
     
     .card {
@@ -51,7 +52,7 @@
       background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
       color: white;
       border-radius: 1.25rem 1.25rem 0 0 !important;
-      padding: 1.5rem;
+      padding: 1rem;
       border-bottom: none;
     }
     
@@ -59,11 +60,12 @@
       background-color: var(--primary);
       border-color: var(--primary);
       border-radius: 0.75rem;
-      padding: 0.5rem 1.25rem;
+      padding: 0.4rem 1rem;
       font-weight: 500;
       letter-spacing: 0.025em;
       transition: all 0.2s ease;
       box-shadow: 0 1px 2px 0 rgba(99, 102, 241, 0.2);
+      font-size: 0.85rem;
     }
     
     .btn-primary:hover {
@@ -79,9 +81,10 @@
       color: var(--primary);
       border: 1px solid var(--primary);
       border-radius: 0.75rem;
-      padding: 0.5rem 1.25rem;
+      padding: 0.4rem 1rem;
       font-weight: 500;
       transition: all 0.2s ease;
+      font-size: 0.85rem;
     }
     
     .btn-secondary:hover {
@@ -92,10 +95,11 @@
     
     .form-control, .form-select {
       border-radius: 0.75rem;
-      padding: 0.75rem 1rem;
+      padding: 0.6rem 0.8rem;
       border: 1px solid #e2e8f0;
       transition: all 0.2s ease;
       box-shadow: none;
+      font-size: 0.85rem;
     }
     
     .form-control:focus, .form-select:focus {
@@ -108,28 +112,33 @@
       display: flex;
       flex-direction: column;
       min-height: 0;
+      position: relative;
+      padding-bottom: 220px; /* Space for fixed input section */
     }
     
     .chat-box {
       flex: 1;
       overflow-y: auto;
       background-color: white;
-      padding: 1.5rem;
+      padding: 1rem;
       border-radius: 0.75rem;
       box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.03);
       border: 1px solid rgba(0, 0, 0, 0.05);
       scroll-behavior: smooth;
       margin-bottom: 1rem;
+      height: calc(100vh - 320px); /* Fixed height for chat area */
+      max-height: calc(100vh - 320px); /* Prevent growing beyond viewport */
     }
     
     .message {
-      margin-bottom: 1.25rem;
-      padding: 0.75rem 1rem;
+      margin-bottom: 1rem;
+      padding: 0.6rem 0.8rem;
       border-radius: 0.75rem;
       max-width: 85%;
       position: relative;
-      line-height: 1.5;
+      line-height: 1.4;
       animation: fadeIn 0.3s ease-out;
+      font-size: 0.85rem;
     }
     
     .message-user {
@@ -151,29 +160,30 @@
       content: "";
       position: absolute;
       top: 0;
-      width: 12px;
-      height: 12px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
     }
     
     .message-user::before {
-      right: -6px;
+      right: -5px;
       background-color: #f1f5f9;
       transform: translateY(-50%);
     }
     
     .message-ai::before {
-      left: -6px;
+      left: -5px;
       background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(79, 70, 229, 0.1) 100%);
       transform: translateY(-50%);
     }
     
     .message-sender {
       font-weight: 600;
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.2rem;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.4rem;
+      font-size: 0.85rem;
     }
     
     .message-user .message-sender {
@@ -185,9 +195,9 @@
     }
     
     .message-time {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: var(--muted);
-      margin-top: 0.25rem;
+      margin-top: 0.2rem;
       text-align: right;
     }
     
@@ -198,7 +208,7 @@
     
     .typing-indicator {
       display: flex;
-      padding: 0.75rem 1rem;
+      padding: 0.6rem 0.8rem;
       background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(79, 70, 229, 0.1) 100%);
       border-radius: 0.75rem;
       margin-right: auto;
@@ -207,8 +217,8 @@
     }
     
     .typing-indicator span {
-      height: 8px;
-      width: 8px;
+      height: 6px;
+      width: 6px;
       background-color: var(--primary);
       border-radius: 50%;
       display: inline-block;
@@ -237,35 +247,66 @@
     .logo {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      font-weight: 700;
-      font-size: 1.25rem;
+      gap: 0.5rem;
+      font-weight: 600;
+      font-size: 1rem;
       color: white;
     }
     
     .logo-icon {
       background-color: white;
       color: var(--primary);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+    }
+    
+    .tooltip-inner {
+      border-radius: 0.5rem;
+      padding: 0.4rem 0.6rem;
+      font-size: 0.8rem;
+    }
+    
+    .input-section {
+      position: fixed;
+      bottom: 1rem;
+      left: 1rem;
+      right: 1rem;
+      padding: 0.8rem;
+      background: white;
+      border-radius: 0.75rem;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.03);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      max-width: calc(100% - 2rem);
+      margin: 0 auto;
+    }
+    
+    /* Jump to bottom button */
+    .jump-to-bottom {
+      position: fixed;
+      right: 2rem;
+      bottom: 220px;
+      background: var(--primary);
+      color: white;
       width: 36px;
       height: 36px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 1000;
     }
     
-    .tooltip-inner {
-      border-radius: 0.5rem;
-      padding: 0.5rem 0.75rem;
-      font-size: 0.875rem;
-    }
-    
-    .input-section {
-      padding: 1rem;
-      background: white;
-      border-radius: 0.75rem;
-      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.03);
+    .jump-to-bottom.visible {
+      opacity: 1;
     }
     
     @media (max-width: 768px) {
@@ -278,7 +319,7 @@
       }
       
       .card-header {
-        padding: 1rem;
+        padding: 0.8rem;
       }
       
       .message {
@@ -286,13 +327,31 @@
       }
       
       .chat-box {
-        padding: 1rem;
+        padding: 0.8rem;
+        height: calc(100vh - 300px);
+        max-height: calc(100vh - 300px);
+      }
+      
+      .input-section {
+        bottom: 0.5rem;
+        left: 0.5rem;
+        right: 0.5rem;
+        max-width: calc(100% - 1rem);
+      }
+      
+      .chat-container {
+        padding-bottom: 200px;
+      }
+      
+      .jump-to-bottom {
+        right: 1rem;
+        bottom: 200px;
       }
     }
     
     /* Custom scrollbar */
     ::-webkit-scrollbar {
-      width: 8px;
+      width: 6px;
     }
     
     ::-webkit-scrollbar-track {
@@ -319,9 +378,9 @@
             <div class="logo-icon">
               <i class="fas fa-robot"></i>
             </div>
-            <span>www.merchant-web.co.uk</span>
+            <span>Maverick</span>
           </div>
-          <div class="badge bg-white text-primary rounded-pill px-3 py-2">
+          <div class="badge bg-white text-primary rounded-pill px-2 py-1" style="font-size: 0.75rem;">
             <i class="fas fa-bolt me-1"></i> AI Assistant
           </div>
         </div>
@@ -332,31 +391,10 @@
             <div class="message message-ai">
               <div class="message-sender">
                 <i class="fas fa-robot"></i>
-                <span>www.merchant-web.co.uk</span>
+                <span>Maverick</span>
               </div>
-              <div>Hello Nick! I'm your business assistant. How can I help you today?</div>
+              <div>Hello Nick! I'm your AI marketing assistant. How can I help you today?</div>
               <div class="message-time">Just now</div>
-            </div>
-          </div>
-          
-          <div class="input-section">
-            <div class="mb-3">
-              <select id="taskSelector" class="form-select">
-                <option value="" disabled selected>Choose an expertise area...</option>
-              </select>
-            </div>
-            
-            <div class="mb-3">
-              <textarea id="userMessage" class="form-control" rows="3" placeholder="Type your message here..."></textarea>
-            </div>
-            
-            <div class="d-flex justify-content-end gap-3">
-              <button id="copyBtn" class="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" title="Copy last response">
-                <i class="far fa-copy me-1"></i> Copy
-              </button>
-              <button id="sendBtn" class="btn btn-primary">
-                <i class="fas fa-paper-plane me-1"></i> Send
-              </button>
             </div>
           </div>
         </div>
@@ -364,26 +402,44 @@
     </div>
   </div>
 
+  <div class="input-section">
+    <div class="mb-2">
+      <select id="taskSelector" class="form-select">
+        <option value="" disabled selected>Choose an expertise area...</option>
+      </select>
+    </div>
+    
+    <div class="mb-2">
+      <textarea id="userMessage" class="form-control" rows="2" placeholder="Type your message here..."></textarea>
+    </div>
+    
+    <div class="d-flex justify-content-end gap-2">
+      <button id="copyBtn" class="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" title="Copy last response">
+        <i class="far fa-copy me-1"></i> Copy
+      </button>
+      <button id="sendBtn" class="btn btn-primary">
+        <i class="fas fa-paper-plane me-1"></i> Send
+      </button>
+    </div>
+  </div>
+
+  <div class="jump-to-bottom" id="jumpToBottom" title="Jump to latest message">
+    <i class="fas fa-arrow-down"></i>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   
 <script>
 const taskOptions = {
-  "Lead Strategies": "You are a top-tier sales strategist who helps digital agencies grow fast. Your role is to help Nick find new ways to sell web design, SEO, and marketing services to tradespeople and local businesses. Generate 3 unique, actionable strategies Nick can use today to generate leads. These can include online tactics, partnerships, or offline methods like flyers or cold calls. The ideas must be creative, relevant to UK small business culture, and easy to action immediately.",
-    
-    "Social Media Content": "You are an expert content marketer working for a creative agency. Your task is to help Nick grow his web design business using Instagram and Facebook. Come up with 3 quality post ideas, including captions, emojis, and 5 relevant hashtags each. The tone should be friendly, professional, and speak directly to sole traders (like plumbers, gardeners, and local services). Include a variety of formats like tips, testimonials, memes, and before-and-after examples.",
-    
-    "Cold Message Templates": "You're a high-converting copywriter. Write 3 message templates Nick can use when reaching out to small business owners via Facebook Messenger or WhatsApp. Each message should be informal but professional, and aim to create curiosity. The goal is to book a call or get a response — not to sell everything upfront. Messages should be short, punchy, and clearly explain why Nick’s offer helps the business owner grow.",
-    
-    "Daily Business Checklist": "Act as a success coach helping Nick grow his digital service business. Create a daily checklist of high-leverage actions that take 2 hours or less to complete. The goal is to grow visibility, attract new leads, and close clients. Include categories like: lead gen, content creation, offer refinement, and follow-up. Make it realistic, repeatable, and easy for Nick to stick to without overwhelm.",
-    
-    "Programming Assistant": "Act as a high level computer programmer. You are a expert in websites and software with a strong understanding of making cyber secure scripts and programs. ",
-    
-    "General Assistant": "Act as helpful personal assistant. You are a expert in websites, software development and business. ",
-    
-    "Wellbeing & Balance": "You are a wellness consultant who specializes in personal wellbeing. Nick sells websites, he spends a lot of time on the computer screen, he likes to ride his bike and keep fit with martial arts, Thai boxing, and yoga. He works alone and often gets stressed by overworking and the anxiety of running a business. Give him daily tips and small actions he can take, and recommend healthy foods. Wish him good luck and success in his business."
+  "Lead Gen Strategies": "You are a top-tier sales strategist...",
+  "Instagram & Facebook Content": "You are an expert content marketer...",
+  "Messenger Templates": "You're a high-converting copywriter...",
+  "Daily Business Checklist": "Act as a success coach...",
+  "High-Level Programming": "Act as a high-level computer programmer...",
+  "Wellbeing & Balance": "You are a wellness consultant..."
 };
 
-const mainPrompt = "You are super assistant for a web design business with expert skills in sales, marketing and SEO with a positive and cheery personality. Refer to the user as Nick";
+const mainPrompt = "You are a Sales and Marketing Genius for a web design business. Refer to the user as Nick";
 let lastResponse = "";
 let isTyping = false;
 let currentAiMessageDiv = null;
@@ -401,6 +457,7 @@ const chatDisplay = document.getElementById("chatDisplay");
 const userMessage = document.getElementById("userMessage");
 const sendBtn = document.getElementById("sendBtn");
 const copyBtn = document.getElementById("copyBtn");
+const jumpToBottomBtn = document.getElementById("jumpToBottom");
 
 // Populate task selector
 Object.keys(taskOptions).forEach(key => {
@@ -410,14 +467,50 @@ Object.keys(taskOptions).forEach(key => {
   taskSelector.appendChild(option);
 });
 
+// Scroll handling
+let isUserScrolling = false;
+let scrollTimeout = null;
+
+chatDisplay.addEventListener('scroll', () => {
+  isUserScrolling = true;
+  clearTimeout(scrollTimeout);
+  
+  // Show jump to bottom button if not at bottom
+  const isAtBottom = chatDisplay.scrollHeight - chatDisplay.scrollTop <= chatDisplay.clientHeight + 50;
+  jumpToBottomBtn.classList.toggle('visible', !isAtBottom);
+  
+  scrollTimeout = setTimeout(() => {
+    isUserScrolling = false;
+  }, 1000);
+});
+
+function scrollToBottom(force = false) {
+  if (isUserScrolling && !force) return;
+  
+  // Use requestAnimationFrame for smoother scrolling
+  requestAnimationFrame(() => {
+    chatDisplay.scrollTo({
+      top: chatDisplay.scrollHeight,
+      behavior: 'smooth'
+    });
+    
+    // Hide jump to bottom button after scrolling
+    jumpToBottomBtn.classList.remove('visible');
+  });
+}
+
+jumpToBottomBtn.addEventListener('click', () => {
+  scrollToBottom(true);
+});
+
 function showTypingIndicator() {
   if (isTyping) return;
   isTyping = true;
   const typingDiv = document.createElement("div");
-  typingDiv.className = "typing-indicator mb-3";
+  typingDiv.className = "typing-indicator mb-2";
   typingDiv.innerHTML = `<span></span><span></span><span></span>`;
   chatDisplay.appendChild(typingDiv);
-  chatDisplay.scrollTop = chatDisplay.scrollHeight;
+  scrollToBottom();
 }
 
 function hideTypingIndicator() {
@@ -447,7 +540,7 @@ function addMessage(sender, message, isUser = false) {
     <div class="message-time">${getCurrentTime()}</div>`;
 
   chatDisplay.appendChild(messageDiv);
-  chatDisplay.scrollTop = chatDisplay.scrollHeight;
+  scrollToBottom();
 
   if (!isUser) {
     lastResponse = message;
@@ -546,6 +639,11 @@ copyBtn.addEventListener("click", () => {
     tooltip.show();
     setTimeout(() => tooltip.hide(), 2000);
   });
+});
+
+// Initial scroll to bottom
+window.addEventListener('load', () => {
+  scrollToBottom(true);
 });
 
 window.addEventListener('beforeunload', () => {
