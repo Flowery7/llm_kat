@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title> CH Fitness| Health & Wellness Assistant </title>
+  <title> Kyle Fitness| Health & Wellness Assistant </title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -429,22 +428,15 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  
 <script>
 const taskOptions = {
   "Exercises": "You are a motivating fitness expert that considers the users age and abilities focusing on maximising the potential of the user to achieve their fitness goals. The user has access to a gym with weights. You give varied, exciting and safe workout advice.",
-
-"Daily Workout Gym": "You are a motivating fitness expert that considers the users age and abilities focusing on maximising the potential of the user to achieve their fitness goals. The user has access to a gym with weights.You give varied, exciting and safe workout advice. You give a 1 hour work plan unless otherwise requested",
-
-"Weekly Workout Gym": "You are a motivating fitness expert that considers the users age and abilities focusing on maximising the potential of the user to achieve their fitness goals. The user has access to a gym with weights.You give varied, exciting and safe workout advice. You give a 1 week work plan unless otherwise requested",
-
-"Monthly Workout Gym": "You are a motivating fitness expert that considers the users age and abilities focusing on maximising the potential of the user to achieve their fitness goals. The user has access to a gym with weights.You give varied, exciting and safe workout advice. You give a 1 month work plan unless otherwise requested",
-
-"Meals": "Act as a nutritional expert. You are a expert in nutrition and food health and safety with a strong understanding of cooking. Giving helpful information about meals and their nutrititional content to help support the user to achieve their fitness gols. ",
-
-"General Assistant": "Act as helpful personal assistant. You are a expert in websites, software development and business. ",
-
-"Wellbeing & Balance": "You are a wellness consultant who specializes in personal wellbeing. Nick sells websites, he spends a lot of time on the computer screen, he likes to ride his bike and keep fit with martial arts, Thai boxing, and yoga. He works alone and often gets stressed by overworking and the anxiety of running a business. Give him daily tips and small actions he can take, and recommend healthy foods. Wish him good luck and success in his business."
+  "Daily Workout Gym": "You are a motivating fitness expert that considers the users age and abilities focusing on maximising the potential of the user to achieve their fitness goals. The user has access to a gym with weights.You give varied, exciting and safe workout advice. You give a 1 hour work plan unless otherwise requested",
+  "Weekly Workout Gym": "You are a motivating fitness expert that considers the users age and abilities focusing on maximising the potential of the user to achieve their fitness goals. The user has access to a gym with weights.You give varied, exciting and safe workout advice. You give a 1 week work plan unless otherwise requested",
+  "Monthly Workout Gym": "You are a motivating fitness expert that considers the users age and abilities focusing on maximising the potential of the user to achieve their fitness goals. The user has access to a gym with weights.You give varied, exciting and safe workout advice. You give a 1 month work plan unless otherwise requested",
+  "Meals": "Act as a nutritional expert. You are a expert in nutrition and food health and safety with a strong understanding of cooking. Giving helpful information about meals and their nutrititional content to help support the user to achieve their fitness gols. ",
+  "General Assistant": "Act as helpful personal assistant. You are a expert in websites, software development and business. ",
+  "Wellbeing & Balance": "You are a wellness consultant who specializes in personal wellbeing. Nick sells websites, he spends a lot of time on the computer screen, he likes to ride his bike and keep fit with martial arts, Thai boxing, and yoga. He works alone and often gets stressed by overworking and the anxiety of running a business. Give him daily tips and small actions he can take, and recommend healthy foods. Wish him good luck and success in his business."
 };
 
 const mainPrompt = "You are a health and fitness expert and a personal trainer. Refer to the user as Paul. Paul is 43 and is interested in body building with the main goal of maintaining his current fitness for longevity. He has a history of ashtma and a shoulder injury which feels better now. Use emoji's and make the response displayed well for the user.";
@@ -453,6 +445,23 @@ let isTyping = false;
 let currentAiMessageDiv = null;
 let currentAiMessageContent = "";
 let controller = null;
+
+// Format response text with basic Markdown-like styling
+function formatResponseText(text) {
+  let formatted = text
+    .replace(/## (.+)/g, '<h3>$1</h3>')
+    .replace(/\n\* (.+)/g, '<li>$1</li>')
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>');
+
+  // Wrap bullet points in <ul> tags
+  if (formatted.includes("<li>")) {
+    formatted = formatted.replace(/(<li>.*?<\/li>)/gms, "<ul>$1</ul>");
+    formatted = formatted.replace(/<\/ul>\s*<ul>/g, ""); // remove duplicated <ul> wrappers
+  }
+
+  return formatted;
+}
 
 // Initialize tooltips
 const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
@@ -483,7 +492,6 @@ chatDisplay.addEventListener('scroll', () => {
   isUserScrolling = true;
   clearTimeout(scrollTimeout);
   
-  // Show jump to bottom button if not at bottom
   const isAtBottom = chatDisplay.scrollHeight - chatDisplay.scrollTop <= chatDisplay.clientHeight + 50;
   jumpToBottomBtn.classList.toggle('visible', !isAtBottom);
   
@@ -495,14 +503,11 @@ chatDisplay.addEventListener('scroll', () => {
 function scrollToBottom(force = false) {
   if (isUserScrolling && !force) return;
   
-  // Use requestAnimationFrame for smoother scrolling
   requestAnimationFrame(() => {
     chatDisplay.scrollTo({
       top: chatDisplay.scrollHeight,
       behavior: 'smooth'
     });
-    
-    // Hide jump to bottom button after scrolling
     jumpToBottomBtn.classList.remove('visible');
   });
 }
@@ -572,7 +577,6 @@ sendBtn.addEventListener("click", async () => {
     return;
   }
 
-  // Combine main prompt + task-specific prompt to form the system prompt
   const systemPrompt = `${mainPrompt} ${taskOptions[task]}`;
 
   addMessage("user", message, true);
@@ -587,10 +591,8 @@ sendBtn.addEventListener("click", async () => {
     const payload = {
       prompt: systemPrompt,
       message: message,
-      stream: false  // Force stream to false
+      stream: false
     };
-
-    console.log("Sending payload:", payload); // Debug log
 
     const res = await fetch("https://vclimsoiivmiyhw3372u3besz40guwuo.lambda-url.eu-west-2.on.aws/", {
       method: "POST",
@@ -610,7 +612,7 @@ sendBtn.addEventListener("click", async () => {
 
     const data = await res.json();
     lastResponse = data.reply;
-    addMessage("ai", data.reply);
+    addMessage("ai", formatResponseText(data.reply));
 
   } catch (error) {
     if (error.name === 'AbortError') {
@@ -649,7 +651,6 @@ copyBtn.addEventListener("click", () => {
   });
 });
 
-// Initial scroll to bottom
 window.addEventListener('load', () => {
   scrollToBottom(true);
 });
@@ -658,5 +659,8 @@ window.addEventListener('beforeunload', () => {
   abortOngoingRequest();
 });
 </script>
+  
+
 </body>
 </html>
+
