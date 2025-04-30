@@ -439,7 +439,7 @@ const taskOptions = {
   "Wellbeing & Balance": "You are a wellness consultant who specializes in personal wellbeing. Nick sells websites, he spends a lot of time on the computer screen, he likes to ride his bike and keep fit with martial arts, Thai boxing, and yoga. He works alone and often gets stressed by overworking and the anxiety of running a business. Give him daily tips and small actions he can take, and recommend healthy foods. Wish him good luck and success in his business."
 };
 
-const mainPrompt = "You are a health and fitness expert and a personal trainer. Refer to the user as Paul. Paul is 43 and is interested in body building with the main goal of maintaining his current fitness for longevity. He has a history of ashtma and a shoulder injury which feels better now. Use emoji's and make the response displayed well for the user.";
+const mainPrompt = "You are a health and fitness expert and a personal trainer. Refer to the user as Paul. Paul is 43 and is interested in body building with the main goal of maintaining his current fitness for longevity. He has a history of ashtma and a shoulder injury which feels better now. Use emoji's and make the response displayed well for the user. Limit response to 600 words.";
 let lastResponse = "";
 let isTyping = false;
 let currentAiMessageDiv = null;
@@ -452,16 +452,17 @@ function formatResponseText(text) {
     .replace(/## (.+)/g, '<h3>$1</h3>')
     .replace(/\n\* (.+)/g, '<li>$1</li>')
     .replace(/\n\n/g, '<br><br>')
-    .replace(/\n/g, '<br>');
+    .replace(/\n/g, '<br>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'); // Bold text
 
-  // Wrap bullet points in <ul> tags
   if (formatted.includes("<li>")) {
     formatted = formatted.replace(/(<li>.*?<\/li>)/gms, "<ul>$1</ul>");
-    formatted = formatted.replace(/<\/ul>\s*<ul>/g, ""); // remove duplicated <ul> wrappers
+    formatted = formatted.replace(/<\/ul>\s*<ul>/g, "");
   }
 
   return formatted;
 }
+
 
 // Initialize tooltips
 const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
