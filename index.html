@@ -447,7 +447,7 @@ const taskOptions = {
 "Wellbeing & Balance": "You are a wellness consultant who specializes in personal wellbeing. Nick sells websites, he spends a lot of time on the computer screen, he likes to ride his bike and keep fit with martial arts, Thai boxing, and yoga. He works alone and often gets stressed by overworking and the anxiety of running a business. Give him daily tips and small actions he can take, and recommend healthy foods. Wish him good luck and success in his business."
 };
 
-const mainPrompt = "You are a health and fitness expert and a personal trainer. Refer to the user as Paul. Paul is 43 and is interested in body building with the main goal of maintaining his current fitness for longevity. He has a history of ashtma and a shoulder injury which feels better now.";
+const mainPrompt = "You are a health and fitness expert and a personal trainer. Refer to the user as Paul. Paul is 43 and is interested in body building with the main goal of maintaining his current fitness for longevity. He has a history of ashtma and a shoulder injury which feels better now. Use emoji's and make the response displayed well for the user.";
 let lastResponse = "";
 let isTyping = false;
 let currentAiMessageDiv = null;
@@ -536,7 +536,7 @@ function addMessage(sender, message, isUser = false) {
   const messageDiv = document.createElement("div");
   messageDiv.className = `message ${isUser ? 'message-user' : 'message-ai'}`;
 
-  const senderName = isUser ? 'Nick' : 'Maverick';
+  const senderName = isUser ? 'Paul' : 'Kyle';
   const senderIcon = isUser ? 'fas fa-user' : 'fas fa-robot';
 
   messageDiv.innerHTML = `
@@ -660,4 +660,3 @@ window.addEventListener('beforeunload', () => {
 </script>
 </body>
 </html>
-
