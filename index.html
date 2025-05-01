@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title> Kyle Fitness| Health & Wellness Assistant </title>
+  <title> CH Fitness| Health & Wellness Assistant </title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -93,6 +93,36 @@
       color: var(--primary-dark);
       transform: translateY(-1px);
     }
+    
+
+
+
+/* Voice button states */
+#voiceBtn.listening {
+  animation: pulse 1.5s infinite;
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: white !important;
+}
+
+/* Mobile voice feedback */
+#mobileVoiceFeedback {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translate(-50%, -45%); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+/* Make sure button is tappable on mobile */
+#voiceBtn {
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
     
     .form-control, .form-select {
       border-radius: 0.75rem;
@@ -421,6 +451,8 @@
       <button id="sendBtn" class="btn btn-primary">
         <i class="fas fa-paper-plane me-1"></i> Send
       </button>
+      
+      
     </div>
   </div>
 
@@ -429,41 +461,30 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
 <script>
 const taskOptions = {
   "Exercises": "You are a motivating fitness expert that considers the users age and abilities focusing on maximising the potential of the user to achieve their fitness goals. The user has access to a gym with weights. You give varied, exciting and safe workout advice.",
-  "Daily Workout Gym": "You are a motivating fitness expert that considers the users age and abilities focusing on maximising the potential of the user to achieve their fitness goals. The user has access to a gym with weights.You give varied, exciting and safe workout advice. You give a 1 hour work plan unless otherwise requested",
-  "Weekly Workout Gym": "You are a motivating fitness expert that considers the users age and abilities focusing on maximising the potential of the user to achieve their fitness goals. The user has access to a gym with weights.You give varied, exciting and safe workout advice. You give a 1 week work plan unless otherwise requested",
-  "Monthly Workout Gym": "You are a motivating fitness expert that considers the users age and abilities focusing on maximising the potential of the user to achieve their fitness goals. The user has access to a gym with weights.You give varied, exciting and safe workout advice. You give a 1 month work plan unless otherwise requested",
-  "Meals": "Act as a nutritional expert. You are a expert in nutrition and food health and safety with a strong understanding of cooking. Giving helpful information about meals and their nutrititional content to help support the user to achieve their fitness gols. ",
-  "General Assistant": "Act as helpful personal assistant. You are a expert in websites, software development and business. ",
-  "Wellbeing & Balance": "You are a wellness consultant who specializes in personal wellbeing. Nick sells websites, he spends a lot of time on the computer screen, he likes to ride his bike and keep fit with martial arts, Thai boxing, and yoga. He works alone and often gets stressed by overworking and the anxiety of running a business. Give him daily tips and small actions he can take, and recommend healthy foods. Wish him good luck and success in his business."
+
+"Daily Workout Gym": "You are a motivating fitness expert that considers the users age and abilities focusing on maximising the potential of the user to achieve their fitness goals. The user has access to a gym with weights.You give varied, exciting and safe workout advice. You give a 1 hour work plan unless otherwise requested",
+
+"Weekly Workout Gym": "You are a motivating fitness expert that considers the users age and abilities focusing on maximising the potential of the user to achieve their fitness goals. The user has access to a gym with weights.You give varied, exciting and safe workout advice. You give a 1 week work plan unless otherwise requested",
+
+"Monthly Workout Gym": "You are a motivating fitness expert that considers the users age and abilities focusing on maximising the potential of the user to achieve their fitness goals. The user has access to a gym with weights.You give varied, exciting and safe workout advice. You give a 1 month work plan unless otherwise requested",
+
+"Meals": "Act as a nutritional expert. You are a expert in nutrition and food health and safety with a strong understanding of cooking. Giving helpful information about meals and their nutrititional content to help support the user to achieve their fitness gols. ",
+
+"General Assistant": "Act as helpful personal assistant. You are a expert in websites, software development and business. ",
+
+"Wellbeing & Balance": "You are a wellness consultant who specializes in personal wellbeing. Nick sells websites, he spends a lot of time on the computer screen, he likes to ride his bike and keep fit with martial arts, Thai boxing, and yoga. He works alone and often gets stressed by overworking and the anxiety of running a business. Give him daily tips and small actions he can take, and recommend healthy foods. Wish him good luck and success in his business."
 };
 
-const mainPrompt = "You are a health and fitness expert and a personal trainer. Refer to the user as Paul. Paul is 43 and is interested in body building with the main goal of maintaining his current fitness for longevity. He has a history of ashtma and a shoulder injury which feels better now. Use emoji's and make the response displayed well for the user. Limit response to 600 words.";
+const mainPrompt = "You are a health and fitness expert and a personal trainer. Refer to the user as Paul. Paul is 43 and is interested in body building with the main goal of maintaining his current fitness for longevity. He has a history of ashtma and a shoulder injury which feels better now. Use emoji's and make the response displayed well for the";
 let lastResponse = "";
 let isTyping = false;
 let currentAiMessageDiv = null;
 let currentAiMessageContent = "";
 let controller = null;
-
-// Format response text with basic Markdown-like styling
-function formatResponseText(text) {
-  let formatted = text
-    .replace(/## (.+)/g, '<h3>$1</h3>')
-    .replace(/\n\* (.+)/g, '<li>$1</li>')
-    .replace(/\n\n/g, '<br><br>')
-    .replace(/\n/g, '<br>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'); // Bold text
-
-  if (formatted.includes("<li>")) {
-    formatted = formatted.replace(/(<li>.*?<\/li>)/gms, "<ul>$1</ul>");
-    formatted = formatted.replace(/<\/ul>\s*<ul>/g, "");
-  }
-
-  return formatted;
-}
-
 
 // Initialize tooltips
 const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
@@ -494,6 +515,7 @@ chatDisplay.addEventListener('scroll', () => {
   isUserScrolling = true;
   clearTimeout(scrollTimeout);
   
+  // Show jump to bottom button if not at bottom
   const isAtBottom = chatDisplay.scrollHeight - chatDisplay.scrollTop <= chatDisplay.clientHeight + 50;
   jumpToBottomBtn.classList.toggle('visible', !isAtBottom);
   
@@ -505,11 +527,14 @@ chatDisplay.addEventListener('scroll', () => {
 function scrollToBottom(force = false) {
   if (isUserScrolling && !force) return;
   
+  // Use requestAnimationFrame for smoother scrolling
   requestAnimationFrame(() => {
     chatDisplay.scrollTo({
       top: chatDisplay.scrollHeight,
       behavior: 'smooth'
     });
+    
+    // Hide jump to bottom button after scrolling
     jumpToBottomBtn.classList.remove('visible');
   });
 }
@@ -579,6 +604,7 @@ sendBtn.addEventListener("click", async () => {
     return;
   }
 
+  // Combine main prompt + task-specific prompt to form the system prompt
   const systemPrompt = `${mainPrompt} ${taskOptions[task]}`;
 
   addMessage("user", message, true);
@@ -593,8 +619,10 @@ sendBtn.addEventListener("click", async () => {
     const payload = {
       prompt: systemPrompt,
       message: message,
-      stream: false
+      stream: false  // Force stream to false
     };
+
+    console.log("Sending payload:", payload); // Debug log
 
     const res = await fetch("https://vclimsoiivmiyhw3372u3besz40guwuo.lambda-url.eu-west-2.on.aws/", {
       method: "POST",
@@ -614,7 +642,7 @@ sendBtn.addEventListener("click", async () => {
 
     const data = await res.json();
     lastResponse = data.reply;
-    addMessage("ai", formatResponseText(data.reply));
+    addMessage("ai", data.reply);
 
   } catch (error) {
     if (error.name === 'AbortError') {
@@ -653,6 +681,7 @@ copyBtn.addEventListener("click", () => {
   });
 });
 
+// Initial scroll to bottom
 window.addEventListener('load', () => {
   scrollToBottom(true);
 });
@@ -661,7 +690,216 @@ window.addEventListener('beforeunload', () => {
   abortOngoingRequest();
 });
 </script>
+
+<script>
+  // Voice recognition and read-aloud functionality
+const voiceBtn = document.createElement('button');
+voiceBtn.id = 'voiceBtn';
+voiceBtn.className = 'btn btn-secondary me-2';
+voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+voiceBtn.title = 'Voice input (click to toggle) - Active mode will read responses aloud';
+document.querySelector('.d-flex.justify-content-end.gap-2').prepend(voiceBtn);
+
+const voiceBtnElement = document.getElementById('voiceBtn');
+let recognition = null;
+let voiceModeActive = false; // Tracks if voice mode is active (for read-aloud)
+let currentUtterance = null; // Tracks the current speech synthesis
+
+// Check for speech recognition support
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.lang = 'en-US';
   
+  // Toggle voice mode on button click
+  voiceBtnElement.addEventListener('click', (e) => {
+    e.preventDefault();
+    
+    // Toggle voice mode
+    voiceModeActive = !voiceModeActive;
+    
+    if (voiceModeActive) {
+      // Activate voice mode (orange color to indicate active)
+      voiceBtnElement.classList.add('listening');
+      voiceBtnElement.innerHTML = '<i class="fas fa-microphone-alt"></i>';
+      voiceBtnElement.style.backgroundColor = 'var(--primary)';
+      voiceBtnElement.style.borderColor = 'var(--primary)';
+      voiceBtnElement.style.color = 'white';
+      
+      // Speak the last response if available
+      if (lastResponse) {
+        speakResponse(lastResponse);
+      }
+    } else {
+      // Deactivate voice mode
+      voiceBtnElement.classList.remove('listening');
+      voiceBtnElement.innerHTML = '<i class="fas fa-microphone"></i>';
+      voiceBtnElement.style.backgroundColor = '';
+      voiceBtnElement.style.borderColor = '';
+      voiceBtnElement.style.color = '';
+      
+      // Stop any ongoing speech
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    }
+  });
+  
+  // Separate click handler for microphone (hold to record)
+  voiceBtnElement.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return; // Only left click
+    if (!voiceModeActive) return;
+    
+    recognition.start();
+    voiceBtnElement.innerHTML = '<i class="fas fa-microphone-slash"></i>';
+    voiceBtnElement.style.backgroundColor = 'var(--primary-dark)';
+    
+    // Show visual feedback for mobile
+    if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+      showMobileVoiceFeedback();
+    }
+  });
+  
+  voiceBtnElement.addEventListener('mouseup', () => {
+    if (recognition && recognition.ongoing) {
+      recognition.stop();
+    }
+    if (voiceModeActive) {
+      voiceBtnElement.innerHTML = '<i class="fas fa-microphone-alt"></i>';
+      voiceBtnElement.style.backgroundColor = 'var(--primary)';
+    }
+  });
+  
+  // For touch devices
+  voiceBtnElement.addEventListener('touchstart', (e) => {
+    if (!voiceModeActive) return;
+    e.preventDefault();
+    recognition.start();
+    voiceBtnElement.innerHTML = '<i class="fas fa-microphone-slash"></i>';
+    voiceBtnElement.style.backgroundColor = 'var(--primary-dark)';
+    showMobileVoiceFeedback();
+  });
+  
+  voiceBtnElement.addEventListener('touchend', () => {
+    if (recognition && recognition.ongoing) {
+      recognition.stop();
+    }
+    if (voiceModeActive) {
+      voiceBtnElement.innerHTML = '<i class="fas fa-microphone-alt"></i>';
+      voiceBtnElement.style.backgroundColor = 'var(--primary)';
+    }
+  });
+  
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    userMessage.value = transcript;
+    
+    // Auto-submit if voice mode is active
+    if (voiceModeActive && transcript.trim().length > 0) {
+      setTimeout(() => sendBtn.click(), 300);
+    }
+  };
+  
+  recognition.onerror = (event) => {
+    console.error('Speech recognition error', event.error);
+    if (voiceModeActive) {
+      voiceBtnElement.innerHTML = '<i class="fas fa-microphone-alt"></i>';
+      voiceBtnElement.style.backgroundColor = 'var(--primary)';
+    }
+    removeMobileVoiceFeedback();
+  };
+  
+  recognition.onend = () => {
+    if (voiceModeActive) {
+      voiceBtnElement.innerHTML = '<i class="fas fa-microphone-alt"></i>';
+      voiceBtnElement.style.backgroundColor = 'var(--primary)';
+    }
+    removeMobileVoiceFeedback();
+  };
+  
+} else {
+  voiceBtnElement.disabled = true;
+  voiceBtnElement.title = 'Voice features not supported in this browser';
+  new bootstrap.Tooltip(voiceBtnElement);
+}
+
+// Function to speak the response
+function speakResponse(text) {
+  if (!voiceModeActive || !('speechSynthesis' in window)) return;
+  
+  // Clean the text from HTML tags
+  const cleanText = text.replace(/<[^>]*>/g, '');
+  
+  // Stop any ongoing speech
+  window.speechSynthesis.cancel();
+  
+  currentUtterance = new SpeechSynthesisUtterance(cleanText);
+  currentUtterance.rate = 1.0;
+  currentUtterance.pitch = 1.0;
+  currentUtterance.volume = 1.0;
+  
+  currentUtterance.onend = () => {
+    currentUtterance = null;
+  };
+  
+  currentUtterance.onerror = (e) => {
+    console.error('Speech synthesis error:', e);
+    currentUtterance = null;
+  };
+  
+  window.speechSynthesis.speak(currentUtterance);
+}
+
+// Mobile feedback functions
+function showMobileVoiceFeedback() {
+  const existing = document.getElementById('mobileVoiceFeedback');
+  if (existing) return;
+  
+  const feedback = document.createElement('div');
+  feedback.id = 'mobileVoiceFeedback';
+  feedback.style.position = 'fixed';
+  feedback.style.top = '50%';
+  feedback.style.left = '50%';
+  feedback.style.transform = 'translate(-50%, -50%)';
+  feedback.style.backgroundColor = 'rgba(0,0,0,0.7)';
+  feedback.style.color = 'white';
+  feedback.style.padding = '20px';
+  feedback.style.borderRadius = '10px';
+  feedback.style.zIndex = '9999';
+  feedback.style.textAlign = 'center';
+  feedback.innerHTML = `
+    <i class="fas fa-microphone fa-3x mb-3" style="color: var(--primary)"></i>
+    <p style="font-size: 1.2rem; margin: 0;">Listening...</p>
+    <p style="font-size: 0.9rem; opacity: 0.8;">Release to stop</p>
+  `;
+  document.body.appendChild(feedback);
+}
+
+function removeMobileVoiceFeedback() {
+  const feedback = document.getElementById('mobileVoiceFeedback');
+  if (feedback) feedback.remove();
+}
+
+// Modify the addMessage function to auto-read when voice mode is active
+const originalAddMessage = addMessage;
+addMessage = function(sender, message, isUser = false) {
+  originalAddMessage(sender, message, isUser);
+  
+  if (!isUser && voiceModeActive) {
+    speakResponse(message);
+  }
+};
+
+// Stop speech when the page is hidden
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && currentUtterance) {
+    window.speechSynthesis.cancel();
+  }
+});
+  
+</script>
 
 </body>
 </html>
