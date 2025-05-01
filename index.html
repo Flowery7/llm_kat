@@ -466,20 +466,20 @@
 const taskOptions = {
   "Exercises": "You are a motivating fitness expert that considers the users age and abilities focusing on maximising the potential of the user to achieve their fitness goals. The user has access to a gym with weights. You give varied, exciting and safe workout advice.",
 
-"Daily Workout Gym": "You are a motivating fitness expert that considers the users age and abilities focusing on maximising the potential of the user to achieve their fitness goals. The user has access to a gym with weights.You give varied, exciting and safe workout advice. You give a 1 hour work plan unless otherwise requested",
+"Daily Workout Gym": "You are a motivating fitness expert that considers the users age and abilities focusing on maximising the potential of the user to achieve their fitness goals. The user has access to a gym with weights.You give varied, exciting and safe workout advice. You give a 1-hour work plan unless otherwise requested",
 
 "Weekly Workout Gym": "You are a motivating fitness expert that considers the users age and abilities focusing on maximising the potential of the user to achieve their fitness goals. The user has access to a gym with weights.You give varied, exciting and safe workout advice. You give a 1 week work plan unless otherwise requested",
 
 "Monthly Workout Gym": "You are a motivating fitness expert that considers the users age and abilities focusing on maximising the potential of the user to achieve their fitness goals. The user has access to a gym with weights.You give varied, exciting and safe workout advice. You give a 1 month work plan unless otherwise requested",
 
-"Meals": "Act as a nutritional expert. You are a expert in nutrition and food health and safety with a strong understanding of cooking. Giving helpful information about meals and their nutrititional content to help support the user to achieve their fitness gols. ",
+"Meals": "Act as a nutritional expert. You are a expert in nutrition and food health and safety with a strong understanding of cooking. Giving helpful information about meals and their nutritional content to help support the user to achieve their fitness gols. ",
 
 "General Assistant": "Act as helpful personal assistant. You are a expert in websites, software development and business. ",
 
 "Wellbeing & Balance": "You are a wellness consultant who specializes in personal wellbeing. Nick sells websites, he spends a lot of time on the computer screen, he likes to ride his bike and keep fit with martial arts, Thai boxing, and yoga. He works alone and often gets stressed by overworking and the anxiety of running a business. Give him daily tips and small actions he can take, and recommend healthy foods. Wish him good luck and success in his business."
 };
 
-const mainPrompt = "You are a health and fitness expert and a personal trainer. Refer to the user as Paul. Paul is 43 and is interested in body building with the main goal of maintaining his current fitness for longevity. He has a history of ashtma and a shoulder injury which feels better now. Use emoji's and make the response displayed well for the";
+const mainPrompt = "You are a health and fitness expert and a personal trainer. Refer to the user as Paul. Paul is 43 and is interested in body building with the main goal of maintaining his current fitness for longevity. He has a history of ashtma and a shoulder injury which feels better now. Use emoji's and make the responses as short as you can.";
 let lastResponse = "";
 let isTyping = false;
 let currentAiMessageDiv = null;
@@ -498,6 +498,24 @@ const userMessage = document.getElementById("userMessage");
 const sendBtn = document.getElementById("sendBtn");
 const copyBtn = document.getElementById("copyBtn");
 const jumpToBottomBtn = document.getElementById("jumpToBottom");
+
+
+function formatResponseText(text) {
+  let formatted = text
+    .replace(/## (.+)/g, '<h3>$1</h3>')
+    .replace(/\n\* (.+)/g, '<li>$1</li>')
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'); // Bold text
+
+  if (formatted.includes("<li>")) {
+    formatted = formatted.replace(/(<li>.*?<\/li>)/gms, "<ul>$1</ul>");
+    formatted = formatted.replace(/<\/ul>\s*<ul>/g, "");
+  }
+
+  return formatted;
+}
+
 
 // Populate task selector
 Object.keys(taskOptions).forEach(key => {
@@ -576,7 +594,8 @@ function addMessage(sender, message, isUser = false) {
       <i class="${senderIcon}"></i>
       <span>${senderName}</span>
     </div>
-    <div>${message}</div>
+   <div>${isUser ? message : formatResponseText(message)}</div>
+
     <div class="message-time">${getCurrentTime()}</div>`;
 
   chatDisplay.appendChild(messageDiv);
@@ -681,25 +700,6 @@ copyBtn.addEventListener("click", () => {
   });
 });
 
-
-function formatResponseText(text) {
-  let formatted = text
-    .replace(/## (.+)/g, '<h3>$1</h3>')
-    .replace(/\n\* (.+)/g, '<li>$1</li>')
-    .replace(/\n\n/g, '<br><br>')
-    .replace(/\n/g, '<br>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'); // Bold text
-
-  if (formatted.includes("<li>")) {
-    formatted = formatted.replace(/(<li>.*?<\/li>)/gms, "<ul>$1</ul>");
-    formatted = formatted.replace(/<\/ul>\s*<ul>/g, "");
-  }
-
-  return formatted;
-}
-
-
-  
 // Initial scroll to bottom
 window.addEventListener('load', () => {
   scrollToBottom(true);
