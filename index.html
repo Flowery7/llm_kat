@@ -718,9 +718,42 @@ window.addEventListener('beforeunload', () => {
   abortOngoingRequest();
 });
 </script>
+<script> 
+// Function to strip emojis from text
+function stripEmojis(text) {
+  // Comprehensive emoji regex pattern
+  const emojiPatterns = [
+    /[\u{1F600}-\u{1F64F}]/gu, // Emoticons
+    /[\u{1F300}-\u{1F5FF}]/gu, // Misc Symbols and Pictographs
+    /[\u{1F680}-\u{1F6FF}]/gu, // Transport & Map
+    /[\u{1F700}-\u{1F77F}]/gu, // Alchemical Symbols
+    /[\u{1F780}-\u{1F7FF}]/gu, // Geometric Shapes Extended
+    /[\u{1F800}-\u{1F8FF}]/gu, // Supplemental Arrows-C
+    /[\u{1F900}-\u{1F9FF}]/gu, // Supplemental Symbols and Pictographs
+    /[\u{1FA00}-\u{1FA6F}]/gu, // Chess Symbols
+    /[\u{1FA70}-\u{1FAFF}]/gu, // Symbols and Pictographs Extended-A
+    /[\u{2600}-\u{26FF}]/gu,   // Misc Symbols
+    /[\u{2700}-\u{27BF}]/gu,   // Dingbats
+    /[\u{E0020}-\u{E007F}]/gu, // Tags
+    /[\u{FE00}-\u{FE0F}]/gu,   // Variation Selectors
+    /[\u{1F1E6}-\u{1F1FF}]/gu   // Flags
+  ];
+  
+  // Remove all emoji patterns
+  let cleanText = text;
+  emojiPatterns.forEach(pattern => {
+    cleanText = cleanText.replace(pattern, '');
+  });
+  
+  // Remove remaining emoji variations
+  cleanText = cleanText.replace(/[\uFE0F]/gu, '');
+  cleanText = cleanText.replace(/[\u200D]/gu, '');
+  
+  // Remove multiple spaces created by emoji removal
+  return cleanText.replace(/\s+/g, ' ').trim();
+}
 
-<script>
-  // Voice recognition and read-aloud functionality
+// Voice recognition and read-aloud functionality
 const voiceBtn = document.createElement('button');
 voiceBtn.id = 'voiceBtn';
 voiceBtn.className = 'btn btn-secondary me-2';
@@ -730,18 +763,18 @@ document.querySelector('.d-flex.justify-content-end.gap-2').prepend(voiceBtn);
 
 const voiceBtnElement = document.getElementById('voiceBtn');
 let recognition = null;
-let voiceModeActive = false; // Tracks if voice mode is active (for read-aloud)
-let currentUtterance = null; // Tracks the current speech synthesis
-
-
-
-
+let voiceModeActive = false;
+let currentUtterance = null;
+let lastResponse = null;
 
 function speakResponse(text) {
   if (!voiceModeActive || !('speechSynthesis' in window)) return;
 
   // Clean HTML and strip emojis
   const cleanText = stripEmojis(text.replace(/<[^>]*>/g, ''));
+
+  // Don't speak if there's no text left after cleaning
+  if (!cleanText.trim()) return;
 
   // Stop any ongoing speech
   window.speechSynthesis.cancel();
@@ -763,11 +796,6 @@ function speakResponse(text) {
   window.speechSynthesis.speak(currentUtterance);
 }
 
-
-
-
-
- 
 // Check for speech recognition support
 if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -776,50 +804,41 @@ if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
   recognition.interimResults = false;
   recognition.lang = 'en-US';
   
-  // Toggle voice mode on button click
   voiceBtnElement.addEventListener('click', (e) => {
     e.preventDefault();
-    
-    // Toggle voice mode
     voiceModeActive = !voiceModeActive;
     
     if (voiceModeActive) {
-      // Activate voice mode (orange color to indicate active)
       voiceBtnElement.classList.add('listening');
       voiceBtnElement.innerHTML = '<i class="fas fa-microphone-alt"></i>';
       voiceBtnElement.style.backgroundColor = 'var(--primary)';
       voiceBtnElement.style.borderColor = 'var(--primary)';
       voiceBtnElement.style.color = 'white';
       
-      // Speak the last response if available
       if (lastResponse) {
         speakResponse(lastResponse);
       }
     } else {
-      // Deactivate voice mode
       voiceBtnElement.classList.remove('listening');
       voiceBtnElement.innerHTML = '<i class="fas fa-microphone"></i>';
       voiceBtnElement.style.backgroundColor = '';
       voiceBtnElement.style.borderColor = '';
       voiceBtnElement.style.color = '';
       
-      // Stop any ongoing speech
       if (window.speechSynthesis) {
         window.speechSynthesis.cancel();
       }
     }
   });
   
-  // Separate click handler for microphone (hold to record)
   voiceBtnElement.addEventListener('mousedown', (e) => {
-    if (e.button !== 0) return; // Only left click
+    if (e.button !== 0) return;
     if (!voiceModeActive) return;
     
     recognition.start();
     voiceBtnElement.innerHTML = '<i class="fas fa-microphone-slash"></i>';
     voiceBtnElement.style.backgroundColor = 'var(--primary-dark)';
     
-    // Show visual feedback for mobile
     if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
       showMobileVoiceFeedback();
     }
@@ -835,7 +854,6 @@ if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
     }
   });
   
-  // For touch devices
   voiceBtnElement.addEventListener('touchstart', (e) => {
     if (!voiceModeActive) return;
     e.preventDefault();
@@ -859,7 +877,6 @@ if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
     const transcript = event.results[0][0].transcript;
     userMessage.value = transcript;
     
-    // Auto-submit if voice mode is active
     if (voiceModeActive && transcript.trim().length > 0) {
       setTimeout(() => sendBtn.click(), 300);
     }
@@ -886,33 +903,6 @@ if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
   voiceBtnElement.disabled = true;
   voiceBtnElement.title = 'Voice features not supported in this browser';
   new bootstrap.Tooltip(voiceBtnElement);
-}
-
-// Function to speak the response
-function speakResponse(text) {
-  if (!voiceModeActive || !('speechSynthesis' in window)) return;
-  
-  // Clean the text from HTML tags
-  const cleanText = text.replace(/<[^>]*>/g, '');
-  
-  // Stop any ongoing speech
-  window.speechSynthesis.cancel();
-  
-  currentUtterance = new SpeechSynthesisUtterance(cleanText);
-  currentUtterance.rate = 1.0;
-  currentUtterance.pitch = 1.0;
-  currentUtterance.volume = 1.0;
-  
-  currentUtterance.onend = () => {
-    currentUtterance = null;
-  };
-  
-  currentUtterance.onerror = (e) => {
-    console.error('Speech synthesis error:', e);
-    currentUtterance = null;
-  };
-  
-  window.speechSynthesis.speak(currentUtterance);
 }
 
 // Mobile feedback functions
@@ -950,8 +940,11 @@ const originalAddMessage = addMessage;
 addMessage = function(sender, message, isUser = false) {
   originalAddMessage(sender, message, isUser);
   
-  if (!isUser && voiceModeActive) {
-    speakResponse(message);
+  if (!isUser) {
+    lastResponse = message;
+    if (voiceModeActive) {
+      speakResponse(message);
+    }
   }
 };
 
@@ -961,8 +954,6 @@ document.addEventListener('visibilitychange', () => {
     window.speechSynthesis.cancel();
   }
 });
-  
-</script>
-
+  </script>
 </body>
 </html>
