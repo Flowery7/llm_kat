@@ -12,7 +12,7 @@
 <meta http-equiv="Referrer-Policy" content="no-referrer-when-downgrade"> <!-- Control referrer info -->
 <meta name="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com;">
 
-<title>CH Fitness | Health & Wellness Assistant</title>
+<title>Fitness Coach | Health & Wellness Assistant</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -325,71 +325,6 @@
       margin: 0 auto;
     }
     
-    
-    
-    
-
-
-
-/* Weight input styling */
-.input-group {
-  flex-wrap: nowrap;
-}
-
-#userWeight {
-  border-top-right-radius: 0 !important;
-  border-bottom-right-radius: 0 !important;
-  max-width: 110px;
-}
-
-#weightUnit {
-  border-top-left-radius: 0 !important;
-  border-bottom-left-radius: 0 !important;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-}
-
-/* Responsive adjustments */
-@media (max-width: 576px) {
-  .input-section .d-flex {
-    flex-direction: column;
-    gap: 0.5rem !important;
-  }
-  
-  .input-section .input-group {
-    max-width: 100% !important;
-    width: 100%;
-  }
-  
-  .input-section .d-flex>.d-flex {
-    width: 100%;
-    justify-content: flex-end;
-  }
-}
-
-/* Validation states */
-.is-valid {
-  border-color: var(--success) !important;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2320bf6b' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right calc(0.375em + 0.1875rem) center;
-  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-}
-
-.is-invalid {
-  border-color: var(--primary) !important;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23ff6b6b'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23ff6b6b' stroke='none'/%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right calc(0.375em + 0.1875rem) center;
-  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-}
-
-
-
-
-
-
-
     /* Jump to bottom button */
     .jump-to-bottom {
       position: fixed;
@@ -507,40 +442,27 @@
     </div>
   </div>
 
-  <!-- Replace your current input-section div with this: -->
-<div class="input-section">
-  <div class="mb-2">
-    <select id="taskSelector" class="form-select">
-      <option value="" disabled selected>Choose an expertise area...</option>
-    </select>
-  </div>
-  
-  <div class="mb-2">
-    <textarea id="userMessage" class="form-control" rows="2" placeholder="Type your message here..."></textarea>
-  </div>
-  
-  <div class="d-flex justify-content-between align-items-center gap-2">
-    <div class="input-group" style="max-width: 180px;">
-      <input type="number" id="userWeight" class="form-control" placeholder="Weight" min="30" max="300" step="0.1">
-      <select id="weightUnit" class="form-select" style="max-width: 70px;">
-        <option value="kg">kg</option>
-        <option value="lbs">lbs</option>
+  <div class="input-section">
+    <div class="mb-2">
+      <select id="taskSelector" class="form-select">
+        <option value="" disabled selected>Choose an expertise area...</option>
       </select>
     </div>
     
-    <div class="d-flex gap-2">
-      <button id="voiceBtn" class="btn btn-secondary">
-        <i class="fas fa-microphone"></i>
-      </button>
+    <div class="mb-2">
+      <textarea id="userMessage" class="form-control" rows="2" placeholder="Type your message here..."></textarea>
+    </div>
+    
+    <div class="d-flex justify-content-end gap-2">
       <button id="copyBtn" class="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" title="Copy last response">
-        <i class="far fa-copy"></i>
+        <i class="far fa-copy me-1"></i> Copy
       </button>
       <button id="sendBtn" class="btn btn-primary">
-        <i class="fas fa-paper-plane"></i>
+        <i class="fas fa-paper-plane me-1"></i> Send
       </button>
+      
+      
     </div>
-  </div>
-</div>
   </div>
 
   <div class="jump-to-bottom" id="jumpToBottom" title="Jump to latest message">
@@ -550,169 +472,395 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   
 <script>
-// ---------------------------- CONFIGURATION ----------------------------
 const taskOptions = {
   "Exercises": "You are a motivating fitness expert that considers the users age and abilities focusing on maximising the potential of the user to achieve their fitness goals. The user has access to a gym with weights. You give varied, exciting and safe workout advice.",
-  "Daily Workout Gym": "You give a 1-hour varied, exciting and safe workout plan, considering user age, abilities, and gym access.",
-  "Weekly Workout Gym": "You give a 1-week varied, exciting and safe workout plan, considering user age, abilities, and gym access.",
-  "Monthly Workout Gym": "You give a 1-month varied, exciting and safe workout plan, considering user age, abilities, and gym access.",
-  "Meals": "Act as a nutritional expert with a strong understanding of cooking and health. Give helpful meal advice and nutritional content to support fitness goals.",
-  "General Assistant": "Act as a helpful personal assistant with expertise in websites, software development, and business.",
-  "Wellbeing & Balance": "You are a wellness consultant. Paul works long shifts, often stressed, enjoys walking, gym, and trying new things. Give daily wellness tips and healthy food suggestions."
+
+"Daily Workout Gym": "You are a motivating fitness expert that considers the users age and abilities focusing on maximising the potential of the user to achieve their fitness goals. The user has access to a gym with weights.You give varied, exciting and safe workout advice. You give a 1-hour work plan unless otherwise requested",
+
+"Weekly Workout Gym": "You are a motivating fitness expert that considers the users age and abilities focusing on maximising the potential of the user to achieve their fitness goals. The user has access to a gym with weights.You give varied, exciting and safe workout advice. You give a 1 week work plan unless otherwise requested",
+
+"Monthly Workout Gym": "You are a motivating fitness expert that considers the users age and abilities focusing on maximising the potential of the user to achieve their fitness goals. The user has access to a gym with weights.You give varied, exciting and safe workout advice. You give a 1 month work plan unless otherwise requested",
+
+"Meals": "Act as a nutritional expert. You are a expert in nutrition and food health and safety with a strong understanding of cooking. Giving helpful information about meals and their nutritional content to help support the user to achieve their fitness gols. ",
+
+"General Assistant": "Act as helpful personal assistant. You are a expert in websites, software development and business. ",
+
+"Wellbeing & Balance": "You are a wellness consultant who specializes in personal wellbeing. Paul works long 12hr shifts sometimes long shifts patterns, he spends a lot of time on the computer screen and under stress, he likes to take walks, go to the gym and try new things. Give him daily tips and small actions he can take, and recommend healthy foods to eat."
 };
 
-const baseMainPrompt = "You are a health and fitness expert and a personal trainer. Refer to the user as Paul. Paul is 43 and is interested in body building with the main goal of maintaining his current fitness for longevity. He has a history of asthma and a shoulder injury which feels better now. Use emoji's and make the responses maximum 400 words.";
+const mainPrompt = "You are a health and fitness expert and a personal trainer. Refer to the user as Paul. Paul is 43 and is interested in body building with the main goal of maintaining his current fitness for longevity. He has a history of ashtma and a shoulder injury which feels better now. Use emoji's and make the responses maximum 400 words.";
 let lastResponse = "";
 let isTyping = false;
 let currentAiMessageDiv = null;
+let currentAiMessageContent = "";
 let controller = null;
 
-// ---------------------------- TOOLTIP SETUP ----------------------------
+// Initialize tooltips
 const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
+tooltipTriggerList.map(function (tooltipTriggerEl) {
+  return new bootstrap.Tooltip(tooltipTriggerEl);
+});
 
-// ---------------------------- DOM ELEMENTS ----------------------------
 const taskSelector = document.getElementById("taskSelector");
 const chatDisplay = document.getElementById("chatDisplay");
 const userMessage = document.getElementById("userMessage");
 const sendBtn = document.getElementById("sendBtn");
 const copyBtn = document.getElementById("copyBtn");
 const jumpToBottomBtn = document.getElementById("jumpToBottom");
-const voiceBtn = document.getElementById("voiceBtn");
-const userWeightInput = document.getElementById('userWeight');
-const weightUnitSelect = document.getElementById('weightUnit');
 
-// ---------------------------- VOICE RECOGNITION ----------------------------
+
+function formatResponseText(text) {
+  let formatted = text
+    .replace(/## (.+)/g, '<h3>$1</h3>')
+    .replace(/\n\* (.+)/g, '<li>$1</li>')
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'); // Bold text
+
+  if (formatted.includes("<li>")) {
+    formatted = formatted.replace(/(<li>.*?<\/li>)/gms, "<ul>$1</ul>");
+    formatted = formatted.replace(/<\/ul>\s*<ul>/g, "");
+  }
+
+  return formatted;
+}
+
+
+// Populate task selector
+Object.keys(taskOptions).forEach(key => {
+  const option = document.createElement("option");
+  option.value = key;
+  option.textContent = key;
+  taskSelector.appendChild(option);
+});
+
+// Scroll handling
+let isUserScrolling = false;
+let scrollTimeout = null;
+
+chatDisplay.addEventListener('scroll', () => {
+  isUserScrolling = true;
+  clearTimeout(scrollTimeout);
+  
+  // Show jump to bottom button if not at bottom
+  const isAtBottom = chatDisplay.scrollHeight - chatDisplay.scrollTop <= chatDisplay.clientHeight + 50;
+  jumpToBottomBtn.classList.toggle('visible', !isAtBottom);
+  
+  scrollTimeout = setTimeout(() => {
+    isUserScrolling = false;
+  }, 1000);
+});
+
+function scrollToBottom(force = false) {
+  if (isUserScrolling && !force) return;
+  
+  // Use requestAnimationFrame for smoother scrolling
+  requestAnimationFrame(() => {
+    chatDisplay.scrollTo({
+      top: chatDisplay.scrollHeight,
+      behavior: 'smooth'
+    });
+    
+    // Hide jump to bottom button after scrolling
+    jumpToBottomBtn.classList.remove('visible');
+  });
+}
+
+jumpToBottomBtn.addEventListener('click', () => {
+  scrollToBottom(true);
+});
+
+function showTypingIndicator() {
+  if (isTyping) return;
+  isTyping = true;
+  const typingDiv = document.createElement("div");
+  typingDiv.className = "typing-indicator mb-2";
+  typingDiv.innerHTML = `<span></span><span></span><span></span>`;
+  chatDisplay.appendChild(typingDiv);
+  scrollToBottom();
+}
+
+function hideTypingIndicator() {
+  isTyping = false;
+  const typingIndicator = chatDisplay.querySelector(".typing-indicator");
+  if (typingIndicator) typingIndicator.remove();
+}
+
+function getCurrentTime() {
+  const now = new Date();
+  return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function addMessage(sender, message, isUser = false) {
+  const messageDiv = document.createElement("div");
+  messageDiv.className = `message ${isUser ? 'message-user' : 'message-ai'}`;
+
+  const senderName = isUser ? 'Paul' : 'Coach';
+  const senderIcon = isUser ? 'fas fa-user' : 'fas fa-robot';
+
+  messageDiv.innerHTML = `
+    <div class="message-sender">
+      <i class="${senderIcon}"></i>
+      <span>${senderName}</span>
+    </div>
+   <div>${isUser ? message : formatResponseText(message)}</div>
+
+    <div class="message-time">${getCurrentTime()}</div>`;
+
+  chatDisplay.appendChild(messageDiv);
+  scrollToBottom();
+
+  if (!isUser) {
+    lastResponse = message;
+  }
+}
+
+function abortOngoingRequest() {
+  if (controller) {
+    controller.abort();
+    controller = null;
+  }
+}
+
+sendBtn.addEventListener("click", async () => {
+  const message = userMessage.value.trim();
+  if (!message) return;
+
+  const task = taskSelector.value;
+  if (!task) {
+    alert("Please select an expertise area first");
+    return;
+  }
+
+  // Combine main prompt + task-specific prompt to form the system prompt
+  const systemPrompt = `${mainPrompt} ${taskOptions[task]}`;
+
+  addMessage("user", message, true);
+  userMessage.value = "";
+
+  abortOngoingRequest();
+  controller = new AbortController();
+
+  showTypingIndicator();
+
+  try {
+    const payload = {
+      prompt: systemPrompt,
+      message: message,
+      stream: false  // Force stream to false
+    };
+
+    console.log("Sending payload:", payload); // Debug log
+
+    const res = await fetch("https://vclimsoiivmiyhw3372u3besz40guwuo.lambda-url.eu-west-2.on.aws/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify(payload),
+      signal: controller.signal
+    });
+
+    if (!res.ok) {
+      const errorBody = await res.text();
+      console.error("Server error:", errorBody);
+      throw new Error(`HTTP ${res.status}: ${errorBody}`);
+    }
+
+    const data = await res.json();
+    lastResponse = data.reply;
+    addMessage("ai", data.reply);
+
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      console.log('Request was aborted');
+    } else {
+      console.error("Fetch error:", error);
+      addMessage("ai", `Error: ${error.message}`);
+    }
+  } finally {
+    hideTypingIndicator();
+    controller = null;
+  }
+});
+
+userMessage.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    sendBtn.click();
+  }
+});
+
+copyBtn.addEventListener("click", () => {
+  if (!lastResponse) {
+    const tooltip = bootstrap.Tooltip.getInstance(copyBtn);
+    tooltip.setContent({ '.tooltip-inner': 'No response to copy' });
+    tooltip.show();
+    setTimeout(() => tooltip.hide(), 2000);
+    return;
+  }
+
+  navigator.clipboard.writeText(lastResponse).then(() => {
+    const tooltip = bootstrap.Tooltip.getInstance(copyBtn);
+    tooltip.setContent({ '.tooltip-inner': 'Copied!' });
+    tooltip.show();
+    setTimeout(() => tooltip.hide(), 2000);
+  });
+});
+
+// Initial scroll to bottom
+window.addEventListener('load', () => {
+  scrollToBottom(true);
+});
+
+window.addEventListener('beforeunload', () => {
+  abortOngoingRequest();
+});
+</script>
+
+<script>
+  // Voice recognition and read-aloud functionality
+const voiceBtn = document.createElement('button');
+voiceBtn.id = 'voiceBtn';
+voiceBtn.className = 'btn btn-secondary me-2';
+voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+voiceBtn.title = 'Voice input (click to toggle) - Active mode will read responses aloud';
+document.querySelector('.d-flex.justify-content-end.gap-2').prepend(voiceBtn);
+
+const voiceBtnElement = document.getElementById('voiceBtn');
 let recognition = null;
-let voiceModeActive = false;
-let currentUtterance = null;
-let isRecording = false;
+let voiceModeActive = false; // Tracks if voice mode is active (for read-aloud)
+let currentUtterance = null; // Tracks the current speech synthesis
 
+// Check for speech recognition support
 if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   recognition = new SpeechRecognition();
   recognition.continuous = false;
   recognition.interimResults = false;
   recognition.lang = 'en-US';
-
-  voiceBtn.addEventListener('click', (e) => {
+  
+  // Toggle voice mode on button click
+  voiceBtnElement.addEventListener('click', (e) => {
     e.preventDefault();
     
-    if (isRecording) {
-      recognition.stop();
-      return;
-    }
-    
+    // Toggle voice mode
     voiceModeActive = !voiceModeActive;
     
     if (voiceModeActive) {
-      voiceBtn.classList.add('listening');
-      voiceBtn.innerHTML = '<i class="fas fa-microphone-alt"></i>';
-      voiceBtn.style.backgroundColor = 'var(--primary)';
-      voiceBtn.style.borderColor = 'var(--primary)';
-      voiceBtn.style.color = 'white';
+      // Activate voice mode (orange color to indicate active)
+      voiceBtnElement.classList.add('listening');
+      voiceBtnElement.innerHTML = '<i class="fas fa-microphone-alt"></i>';
+      voiceBtnElement.style.backgroundColor = 'var(--primary)';
+      voiceBtnElement.style.borderColor = 'var(--primary)';
+      voiceBtnElement.style.color = 'white';
       
+      // Speak the last response if available
       if (lastResponse) {
         speakResponse(lastResponse);
       }
     } else {
-      voiceBtn.classList.remove('listening');
-      voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-      voiceBtn.style.backgroundColor = '';
-      voiceBtn.style.borderColor = '';
-      voiceBtn.style.color = '';
+      // Deactivate voice mode
+      voiceBtnElement.classList.remove('listening');
+      voiceBtnElement.innerHTML = '<i class="fas fa-microphone"></i>';
+      voiceBtnElement.style.backgroundColor = '';
+      voiceBtnElement.style.borderColor = '';
+      voiceBtnElement.style.color = '';
       
+      // Stop any ongoing speech
       if (window.speechSynthesis) {
         window.speechSynthesis.cancel();
       }
     }
   });
-
-  voiceBtn.addEventListener('mousedown', startRecording);
-  voiceBtn.addEventListener('touchstart', startRecording);
-  voiceBtn.addEventListener('mouseup', stopRecording);
-  voiceBtn.addEventListener('touchend', stopRecording);
-  voiceBtn.addEventListener('mouseleave', stopRecording);
-
-  recognition.onresult = async (event) => {
+  
+  // Separate click handler for microphone (hold to record)
+  voiceBtnElement.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return; // Only left click
+    if (!voiceModeActive) return;
+    
+    recognition.start();
+    voiceBtnElement.innerHTML = '<i class="fas fa-microphone-slash"></i>';
+    voiceBtnElement.style.backgroundColor = 'var(--primary-dark)';
+    
+    // Show visual feedback for mobile
+    if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+      showMobileVoiceFeedback();
+    }
+  });
+  
+  voiceBtnElement.addEventListener('mouseup', () => {
+    if (recognition && recognition.ongoing) {
+      recognition.stop();
+    }
+    if (voiceModeActive) {
+      voiceBtnElement.innerHTML = '<i class="fas fa-microphone-alt"></i>';
+      voiceBtnElement.style.backgroundColor = 'var(--primary)';
+    }
+  });
+  
+  // For touch devices
+  voiceBtnElement.addEventListener('touchstart', (e) => {
+    if (!voiceModeActive) return;
+    e.preventDefault();
+    recognition.start();
+    voiceBtnElement.innerHTML = '<i class="fas fa-microphone-slash"></i>';
+    voiceBtnElement.style.backgroundColor = 'var(--primary-dark)';
+    showMobileVoiceFeedback();
+  });
+  
+  voiceBtnElement.addEventListener('touchend', () => {
+    if (recognition && recognition.ongoing) {
+      recognition.stop();
+    }
+    if (voiceModeActive) {
+      voiceBtnElement.innerHTML = '<i class="fas fa-microphone-alt"></i>';
+      voiceBtnElement.style.backgroundColor = 'var(--primary)';
+    }
+  });
+  
+  recognition.onresult = (event) => {
     const transcript = event.results[0][0].transcript;
     userMessage.value = transcript;
     
+    // Auto-submit if voice mode is active
     if (voiceModeActive && transcript.trim().length > 0) {
-      if (!taskSelector.value) {
-        alert("Please select an expertise area first");
-      } else {
-        await sendMessageToAPI(transcript);
-      }
+      setTimeout(() => sendBtn.click(), 300);
     }
-    
-    isRecording = false;
-    updateVoiceButtonState();
   };
-
+  
   recognition.onerror = (event) => {
     console.error('Speech recognition error', event.error);
-    isRecording = false;
-    updateVoiceButtonState();
-    removeMobileVoiceFeedback();
-    
-    if (event.error === 'not-allowed') {
-      alert('Microphone access was denied. Please allow microphone access to use voice input.');
+    if (voiceModeActive) {
+      voiceBtnElement.innerHTML = '<i class="fas fa-microphone-alt"></i>';
+      voiceBtnElement.style.backgroundColor = 'var(--primary)';
     }
+    removeMobileVoiceFeedback();
   };
-
+  
   recognition.onend = () => {
-    isRecording = false;
-    updateVoiceButtonState();
+    if (voiceModeActive) {
+      voiceBtnElement.innerHTML = '<i class="fas fa-microphone-alt"></i>';
+      voiceBtnElement.style.backgroundColor = 'var(--primary)';
+    }
     removeMobileVoiceFeedback();
   };
   
 } else {
-  voiceBtn.disabled = true;
-  voiceBtn.title = 'Voice features not supported in this browser';
-  new bootstrap.Tooltip(voiceBtn);
+  voiceBtnElement.disabled = true;
+  voiceBtnElement.title = 'Voice features not supported in this browser';
+  new bootstrap.Tooltip(voiceBtnElement);
 }
 
-// ---------------------------- VOICE FUNCTIONS ----------------------------
-function startRecording(e) {
-  if (e.type === 'touchstart') e.preventDefault();
-  if (!voiceModeActive || isRecording) return;
-  
-  try {
-    recognition.start();
-    isRecording = true;
-    updateVoiceButtonState();
-    showMobileVoiceFeedback();
-  } catch (err) {
-    console.error('Speech recognition error:', err);
-    isRecording = false;
-    updateVoiceButtonState();
-  }
-}
-
-function stopRecording() {
-  if (isRecording && recognition) {
-    recognition.stop();
-  }
-}
-
-function updateVoiceButtonState() {
-  if (isRecording) {
-    voiceBtn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
-    voiceBtn.style.backgroundColor = 'var(--primary-dark)';
-  } else if (voiceModeActive) {
-    voiceBtn.innerHTML = '<i class="fas fa-microphone-alt"></i>';
-    voiceBtn.style.backgroundColor = 'var(--primary)';
-  } else {
-    voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-    voiceBtn.style.backgroundColor = '';
-  }
-}
-
+// Function to speak the response
 function speakResponse(text) {
   if (!voiceModeActive || !('speechSynthesis' in window)) return;
   
+  // Clean the text from HTML tags
   const cleanText = text.replace(/<[^>]*>/g, '');
+  
+  // Stop any ongoing speech
   window.speechSynthesis.cancel();
   
   currentUtterance = new SpeechSynthesisUtterance(cleanText);
@@ -720,7 +868,10 @@ function speakResponse(text) {
   currentUtterance.pitch = 1.0;
   currentUtterance.volume = 1.0;
   
-  currentUtterance.onend = () => currentUtterance = null;
+  currentUtterance.onend = () => {
+    currentUtterance = null;
+  };
+  
   currentUtterance.onerror = (e) => {
     console.error('Speech synthesis error:', e);
     currentUtterance = null;
@@ -729,6 +880,7 @@ function speakResponse(text) {
   window.speechSynthesis.speak(currentUtterance);
 }
 
+// Mobile feedback functions
 function showMobileVoiceFeedback() {
   const existing = document.getElementById('mobileVoiceFeedback');
   if (existing) return;
@@ -758,194 +910,24 @@ function removeMobileVoiceFeedback() {
   if (feedback) feedback.remove();
 }
 
-// ---------------------------- WEIGHT MANAGEMENT ----------------------------
-let userWeight = null;
-let weightUnit = 'kg';
-
-if (localStorage.getItem('userWeight')) {
-  userWeight = parseFloat(localStorage.getItem('userWeight'));
-  weightUnit = localStorage.getItem('weightUnit') || 'kg';
-  userWeightInput.value = userWeight;
-  weightUnitSelect.value = weightUnit;
-  userWeightInput.classList.add('is-valid');
-}
-
-function updateWeight() {
-  const value = parseFloat(userWeightInput.value);
-  if (!isNaN(value) && value >= 30 && value <= 300) {
-    userWeight = value;
-    weightUnit = weightUnitSelect.value;
-    userWeightInput.classList.remove('is-invalid');
-    userWeightInput.classList.add('is-valid');
-    localStorage.setItem('userWeight', userWeight);
-    localStorage.setItem('weightUnit', weightUnit);
-  } else if (userWeightInput.value === '') {
-    userWeight = null;
-    userWeightInput.classList.remove('is-invalid', 'is-valid');
-  } else {
-    userWeightInput.classList.add('is-invalid');
+// Modify the addMessage function to auto-read when voice mode is active
+const originalAddMessage = addMessage;
+addMessage = function(sender, message, isUser = false) {
+  originalAddMessage(sender, message, isUser);
+  
+  if (!isUser && voiceModeActive) {
+    speakResponse(message);
   }
-}
+};
 
-userWeightInput.addEventListener('change', updateWeight);
-weightUnitSelect.addEventListener('change', updateWeight);
-
-// ---------------------------- MESSAGE FUNCTIONS ----------------------------
-async function sendMessageToAPI(message) {
-  const task = taskSelector.value;
-  if (!task) return;
-
-  let weightNote = userWeight ? ` Paul weighs ${userWeight}${weightUnit}.` : '';
-  const systemPrompt = `${baseMainPrompt} ${taskOptions[task]}${weightNote}`;
-
-  addMessage("user", message, true);
-  userMessage.value = "";
-
-  abortOngoingRequest();
-  controller = new AbortController();
-  showTypingIndicator();
-
-  try {
-    const res = await fetch("https://vclimsoiivmiyhw3372u3besz40guwuo.lambda-url.eu-west-2.on.aws/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Accept": "application/json" },
-      body: JSON.stringify({ prompt: systemPrompt, message, stream: false }),
-      signal: controller.signal
-    });
-
-    if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-    const data = await res.json();
-    addMessage("ai", data.reply);
-    if (voiceModeActive) speakResponse(data.reply);
-
-  } catch (err) {
-    if (err.name !== 'AbortError') {
-      console.error(err);
-      addMessage("ai", `Error: ${err.message}`);
-    }
-  } finally {
-    hideTypingIndicator();
-    controller = null;
-  }
-}
-
-function formatResponseText(text) {
-  let formatted = text
-    .replace(/## (.+)/g, '<h3>$1</h3>')
-    .replace(/\n\* (.+)/g, '<li>$1</li>')
-    .replace(/\n\n/g, '<br><br>')
-    .replace(/\n/g, '<br>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-
-  if (formatted.includes("<li>")) {
-    formatted = formatted.replace(/(<li>.*?<\/li>)/gms, "<ul>$1</ul>");
-    formatted = formatted.replace(/<\/ul>\s*<ul>/g, "");
-  }
-
-  return formatted;
-}
-
-function getCurrentTime() {
-  const now = new Date();
-  return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
-
-function scrollToBottom(force = false) {
-  if (!force && isUserScrolling) return;
-  requestAnimationFrame(() => {
-    chatDisplay.scrollTo({ top: chatDisplay.scrollHeight, behavior: 'smooth' });
-    jumpToBottomBtn.classList.remove('visible');
-  });
-}
-
-function showTypingIndicator() {
-  if (isTyping) return;
-  isTyping = true;
-  const typingDiv = document.createElement("div");
-  typingDiv.className = "typing-indicator mb-2";
-  typingDiv.innerHTML = `<span></span><span></span><span></span>`;
-  chatDisplay.appendChild(typingDiv);
-  scrollToBottom();
-}
-
-function hideTypingIndicator() {
-  isTyping = false;
-  const typing = chatDisplay.querySelector(".typing-indicator");
-  if (typing) typing.remove();
-}
-
-function addMessage(sender, message, isUser = false) {
-  const messageDiv = document.createElement("div");
-  messageDiv.className = `message ${isUser ? 'message-user' : 'message-ai'}`;
-  const senderName = isUser ? 'Paul' : 'Kyle';
-  const senderIcon = isUser ? 'fas fa-user' : 'fas fa-robot';
-  messageDiv.innerHTML = `
-    <div class="message-sender"><i class="${senderIcon}"></i><span>${senderName}</span></div>
-    <div>${isUser ? message : formatResponseText(message)}</div>
-    <div class="message-time">${getCurrentTime()}</div>`;
-  chatDisplay.appendChild(messageDiv);
-  scrollToBottom();
-  if (!isUser) lastResponse = message;
-}
-
-function abortOngoingRequest() {
-  if (controller) {
-    controller.abort();
-    controller = null;
-  }
-}
-
-// ---------------------------- EVENT HANDLERS ----------------------------
-sendBtn.addEventListener("click", () => sendMessageToAPI(userMessage.value.trim()));
-
-userMessage.addEventListener("keydown", e => {
-  if (e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault();
-    sendBtn.click();
-  }
-});
-
-copyBtn.addEventListener("click", () => {
-  const tooltip = bootstrap.Tooltip.getInstance(copyBtn);
-  if (!lastResponse) {
-    tooltip.setContent({ '.tooltip-inner': 'No response to copy' });
-    tooltip.show();
-    setTimeout(() => tooltip.hide(), 2000);
-    return;
-  }
-  navigator.clipboard.writeText(lastResponse).then(() => {
-    tooltip.setContent({ '.tooltip-inner': 'Copied!' });
-    tooltip.show();
-    setTimeout(() => tooltip.hide(), 2000);
-  });
-});
-
-jumpToBottomBtn.addEventListener('click', () => scrollToBottom(true));
-
-chatDisplay.addEventListener('scroll', () => {
-  isUserScrolling = true;
-  clearTimeout(scrollTimeout);
-  const isAtBottom = chatDisplay.scrollHeight - chatDisplay.scrollTop <= chatDisplay.clientHeight + 50;
-  jumpToBottomBtn.classList.toggle('visible', !isAtBottom);
-  scrollTimeout = setTimeout(() => isUserScrolling = false, 1000);
-});
-
-window.addEventListener('load', () => scrollToBottom(true));
-window.addEventListener('beforeunload', () => abortOngoingRequest());
-
-// ---------------------------- INITIALIZATION ----------------------------
-Object.keys(taskOptions).forEach(key => {
-  const option = document.createElement("option");
-  option.value = key;
-  option.textContent = key;
-  taskSelector.appendChild(option);
-});
-
+// Stop speech when the page is hidden
 document.addEventListener('visibilitychange', () => {
   if (document.hidden && currentUtterance) {
     window.speechSynthesis.cancel();
   }
 });
+  
 </script>
+
 </body>
 </html>
