@@ -578,11 +578,187 @@ const userMessage = document.getElementById("userMessage");
 const sendBtn = document.getElementById("sendBtn");
 const copyBtn = document.getElementById("copyBtn");
 const jumpToBottomBtn = document.getElementById("jumpToBottom");
-
+const voiceBtn = document.getElementById("voiceBtn");
 const userWeightInput = document.getElementById('userWeight');
 const weightUnitSelect = document.getElementById('weightUnit');
 
-// ---------------------------- LOAD WEIGHT ----------------------------
+// ---------------------------- VOICE RECOGNITION ----------------------------
+let recognition = null;
+let voiceModeActive = false;
+let currentUtterance = null;
+let isRecording = false;
+
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.lang = 'en-US';
+
+  voiceBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    
+    if (isRecording) {
+      recognition.stop();
+      return;
+    }
+    
+    voiceModeActive = !voiceModeActive;
+    
+    if (voiceModeActive) {
+      voiceBtn.classList.add('listening');
+      voiceBtn.innerHTML = '<i class="fas fa-microphone-alt"></i>';
+      voiceBtn.style.backgroundColor = 'var(--primary)';
+      voiceBtn.style.borderColor = 'var(--primary)';
+      voiceBtn.style.color = 'white';
+      
+      if (lastResponse) {
+        speakResponse(lastResponse);
+      }
+    } else {
+      voiceBtn.classList.remove('listening');
+      voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+      voiceBtn.style.backgroundColor = '';
+      voiceBtn.style.borderColor = '';
+      voiceBtn.style.color = '';
+      
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    }
+  });
+
+  voiceBtn.addEventListener('mousedown', startRecording);
+  voiceBtn.addEventListener('touchstart', startRecording);
+  voiceBtn.addEventListener('mouseup', stopRecording);
+  voiceBtn.addEventListener('touchend', stopRecording);
+  voiceBtn.addEventListener('mouseleave', stopRecording);
+
+  recognition.onresult = async (event) => {
+    const transcript = event.results[0][0].transcript;
+    userMessage.value = transcript;
+    
+    if (voiceModeActive && transcript.trim().length > 0) {
+      if (!taskSelector.value) {
+        alert("Please select an expertise area first");
+      } else {
+        await sendMessageToAPI(transcript);
+      }
+    }
+    
+    isRecording = false;
+    updateVoiceButtonState();
+  };
+
+  recognition.onerror = (event) => {
+    console.error('Speech recognition error', event.error);
+    isRecording = false;
+    updateVoiceButtonState();
+    removeMobileVoiceFeedback();
+    
+    if (event.error === 'not-allowed') {
+      alert('Microphone access was denied. Please allow microphone access to use voice input.');
+    }
+  };
+
+  recognition.onend = () => {
+    isRecording = false;
+    updateVoiceButtonState();
+    removeMobileVoiceFeedback();
+  };
+  
+} else {
+  voiceBtn.disabled = true;
+  voiceBtn.title = 'Voice features not supported in this browser';
+  new bootstrap.Tooltip(voiceBtn);
+}
+
+// ---------------------------- VOICE FUNCTIONS ----------------------------
+function startRecording(e) {
+  if (e.type === 'touchstart') e.preventDefault();
+  if (!voiceModeActive || isRecording) return;
+  
+  try {
+    recognition.start();
+    isRecording = true;
+    updateVoiceButtonState();
+    showMobileVoiceFeedback();
+  } catch (err) {
+    console.error('Speech recognition error:', err);
+    isRecording = false;
+    updateVoiceButtonState();
+  }
+}
+
+function stopRecording() {
+  if (isRecording && recognition) {
+    recognition.stop();
+  }
+}
+
+function updateVoiceButtonState() {
+  if (isRecording) {
+    voiceBtn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
+    voiceBtn.style.backgroundColor = 'var(--primary-dark)';
+  } else if (voiceModeActive) {
+    voiceBtn.innerHTML = '<i class="fas fa-microphone-alt"></i>';
+    voiceBtn.style.backgroundColor = 'var(--primary)';
+  } else {
+    voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+    voiceBtn.style.backgroundColor = '';
+  }
+}
+
+function speakResponse(text) {
+  if (!voiceModeActive || !('speechSynthesis' in window)) return;
+  
+  const cleanText = text.replace(/<[^>]*>/g, '');
+  window.speechSynthesis.cancel();
+  
+  currentUtterance = new SpeechSynthesisUtterance(cleanText);
+  currentUtterance.rate = 1.0;
+  currentUtterance.pitch = 1.0;
+  currentUtterance.volume = 1.0;
+  
+  currentUtterance.onend = () => currentUtterance = null;
+  currentUtterance.onerror = (e) => {
+    console.error('Speech synthesis error:', e);
+    currentUtterance = null;
+  };
+  
+  window.speechSynthesis.speak(currentUtterance);
+}
+
+function showMobileVoiceFeedback() {
+  const existing = document.getElementById('mobileVoiceFeedback');
+  if (existing) return;
+  
+  const feedback = document.createElement('div');
+  feedback.id = 'mobileVoiceFeedback';
+  feedback.style.position = 'fixed';
+  feedback.style.top = '50%';
+  feedback.style.left = '50%';
+  feedback.style.transform = 'translate(-50%, -50%)';
+  feedback.style.backgroundColor = 'rgba(0,0,0,0.7)';
+  feedback.style.color = 'white';
+  feedback.style.padding = '20px';
+  feedback.style.borderRadius = '10px';
+  feedback.style.zIndex = '9999';
+  feedback.style.textAlign = 'center';
+  feedback.innerHTML = `
+    <i class="fas fa-microphone fa-3x mb-3" style="color: var(--primary)"></i>
+    <p style="font-size: 1.2rem; margin: 0;">Listening...</p>
+    <p style="font-size: 0.9rem; opacity: 0.8;">Release to stop</p>
+  `;
+  document.body.appendChild(feedback);
+}
+
+function removeMobileVoiceFeedback() {
+  const feedback = document.getElementById('mobileVoiceFeedback');
+  if (feedback) feedback.remove();
+}
+
+// ---------------------------- WEIGHT MANAGEMENT ----------------------------
 let userWeight = null;
 let weightUnit = 'kg';
 
@@ -614,7 +790,45 @@ function updateWeight() {
 userWeightInput.addEventListener('change', updateWeight);
 weightUnitSelect.addEventListener('change', updateWeight);
 
-// ---------------------------- HELPER FUNCTIONS ----------------------------
+// ---------------------------- MESSAGE FUNCTIONS ----------------------------
+async function sendMessageToAPI(message) {
+  const task = taskSelector.value;
+  if (!task) return;
+
+  let weightNote = userWeight ? ` Paul weighs ${userWeight}${weightUnit}.` : '';
+  const systemPrompt = `${baseMainPrompt} ${taskOptions[task]}${weightNote}`;
+
+  addMessage("user", message, true);
+  userMessage.value = "";
+
+  abortOngoingRequest();
+  controller = new AbortController();
+  showTypingIndicator();
+
+  try {
+    const res = await fetch("https://vclimsoiivmiyhw3372u3besz40guwuo.lambda-url.eu-west-2.on.aws/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify({ prompt: systemPrompt, message, stream: false }),
+      signal: controller.signal
+    });
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+    const data = await res.json();
+    addMessage("ai", data.reply);
+    if (voiceModeActive) speakResponse(data.reply);
+
+  } catch (err) {
+    if (err.name !== 'AbortError') {
+      console.error(err);
+      addMessage("ai", `Error: ${err.message}`);
+    }
+  } finally {
+    hideTypingIndicator();
+    controller = null;
+  }
+}
+
 function formatResponseText(text) {
   let formatted = text
     .replace(/## (.+)/g, '<h3>$1</h3>')
@@ -682,48 +896,7 @@ function abortOngoingRequest() {
 }
 
 // ---------------------------- EVENT HANDLERS ----------------------------
-sendBtn.addEventListener("click", async () => {
-  const message = userMessage.value.trim();
-  if (!message) return;
-
-  const task = taskSelector.value;
-  if (!task) {
-    alert("Please select an expertise area first");
-    return;
-  }
-
-  let weightNote = userWeight ? ` Paul weighs ${userWeight}${weightUnit}.` : '';
-  const systemPrompt = `${baseMainPrompt} ${taskOptions[task]}${weightNote}`;
-
-  addMessage("user", message, true);
-  userMessage.value = "";
-
-  abortOngoingRequest();
-  controller = new AbortController();
-  showTypingIndicator();
-
-  try {
-    const res = await fetch("https://vclimsoiivmiyhw3372u3besz40guwuo.lambda-url.eu-west-2.on.aws/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Accept": "application/json" },
-      body: JSON.stringify({ prompt: systemPrompt, message, stream: false }),
-      signal: controller.signal
-    });
-
-    if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-    const data = await res.json();
-    addMessage("ai", data.reply);
-
-  } catch (err) {
-    if (err.name !== 'AbortError') {
-      console.error(err);
-      addMessage("ai", `Error: ${err.message}`);
-    }
-  } finally {
-    hideTypingIndicator();
-    controller = null;
-  }
-});
+sendBtn.addEventListener("click", () => sendMessageToAPI(userMessage.value.trim()));
 
 userMessage.addEventListener("keydown", e => {
   if (e.key === "Enter" && !e.shiftKey) {
@@ -760,14 +933,19 @@ chatDisplay.addEventListener('scroll', () => {
 window.addEventListener('load', () => scrollToBottom(true));
 window.addEventListener('beforeunload', () => abortOngoingRequest());
 
-// ---------------------------- POPULATE TASK DROPDOWN ----------------------------
+// ---------------------------- INITIALIZATION ----------------------------
 Object.keys(taskOptions).forEach(key => {
   const option = document.createElement("option");
   option.value = key;
   option.textContent = key;
   taskSelector.appendChild(option);
 });
-</script>
 
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && currentUtterance) {
+    window.speechSynthesis.cancel();
+  }
+});
+</script>
 </body>
 </html>
