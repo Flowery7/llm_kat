@@ -733,6 +733,41 @@ let recognition = null;
 let voiceModeActive = false; // Tracks if voice mode is active (for read-aloud)
 let currentUtterance = null; // Tracks the current speech synthesis
 
+
+
+
+
+function speakResponse(text) {
+  if (!voiceModeActive || !('speechSynthesis' in window)) return;
+
+  // Clean HTML and strip emojis
+  const cleanText = stripEmojis(text.replace(/<[^>]*>/g, ''));
+
+  // Stop any ongoing speech
+  window.speechSynthesis.cancel();
+
+  currentUtterance = new SpeechSynthesisUtterance(cleanText);
+  currentUtterance.rate = 1.0;
+  currentUtterance.pitch = 1.0;
+  currentUtterance.volume = 1.0;
+
+  currentUtterance.onend = () => {
+    currentUtterance = null;
+  };
+
+  currentUtterance.onerror = (e) => {
+    console.error('Speech synthesis error:', e);
+    currentUtterance = null;
+  };
+
+  window.speechSynthesis.speak(currentUtterance);
+}
+
+
+
+
+
+ 
 // Check for speech recognition support
 if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
