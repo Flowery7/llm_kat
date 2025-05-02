@@ -866,18 +866,12 @@ const mainPrompt = `You are a health and fitness expert and a personal trainer. 
 
 
 <script>
-  // Voice recognition and read-aloud functionality
-const voiceBtn = document.createElement('button');
-voiceBtn.id = 'voiceBtn';
-voiceBtn.className = 'btn btn-secondary me-2';
-voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-voiceBtn.title = 'Voice input (click to toggle) - Active mode will read responses aloud';
-document.querySelector('.d-flex.justify-content-end.gap-2').prepend(voiceBtn);
-
-const voiceBtnElement = document.getElementById('voiceBtn');
+// Voice recognition and read-aloud functionality
+const voiceBtn = document.getElementById('voiceBtn');
 let recognition = null;
-let voiceModeActive = false; // Tracks if voice mode is active (for read-aloud)
-let currentUtterance = null; // Tracks the current speech synthesis
+let voiceModeActive = false;
+let currentUtterance = null;
+let isRecording = false;
 
 // Check for speech recognition support
 if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -886,21 +880,27 @@ if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
   recognition.continuous = false;
   recognition.interimResults = false;
   recognition.lang = 'en-US';
-  
+
   // Toggle voice mode on button click
-  voiceBtnElement.addEventListener('click', (e) => {
+  voiceBtn.addEventListener('click', (e) => {
     e.preventDefault();
+    
+    if (isRecording) {
+      // If currently recording, stop recording
+      recognition.stop();
+      return;
+    }
     
     // Toggle voice mode
     voiceModeActive = !voiceModeActive;
     
     if (voiceModeActive) {
-      // Activate voice mode (orange color to indicate active)
-      voiceBtnElement.classList.add('listening');
-      voiceBtnElement.innerHTML = '<i class="fas fa-microphone-alt"></i>';
-      voiceBtnElement.style.backgroundColor = 'var(--primary)';
-      voiceBtnElement.style.borderColor = 'var(--primary)';
-      voiceBtnElement.style.color = 'white';
+      // Activate voice mode
+      voiceBtn.classList.add('listening');
+      voiceBtn.innerHTML = '<i class="fas fa-microphone-alt"></i>';
+      voiceBtn.style.backgroundColor = 'var(--primary)';
+      voiceBtn.style.borderColor = 'var(--primary)';
+      voiceBtn.style.color = 'white';
       
       // Speak the last response if available
       if (lastResponse) {
@@ -908,11 +908,11 @@ if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       }
     } else {
       // Deactivate voice mode
-      voiceBtnElement.classList.remove('listening');
-      voiceBtnElement.innerHTML = '<i class="fas fa-microphone"></i>';
-      voiceBtnElement.style.backgroundColor = '';
-      voiceBtnElement.style.borderColor = '';
-      voiceBtnElement.style.color = '';
+      voiceBtn.classList.remove('listening');
+      voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+      voiceBtn.style.backgroundColor = '';
+      voiceBtn.style.borderColor = '';
+      voiceBtn.style.color = '';
       
       // Stop any ongoing speech
       if (window.speechSynthesis) {
@@ -920,83 +920,93 @@ if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       }
     }
   });
-  
-  // Separate click handler for microphone (hold to record)
-  voiceBtnElement.addEventListener('mousedown', (e) => {
-    if (e.button !== 0) return; // Only left click
-    if (!voiceModeActive) return;
-    
-    recognition.start();
-    voiceBtnElement.innerHTML = '<i class="fas fa-microphone-slash"></i>';
-    voiceBtnElement.style.backgroundColor = 'var(--primary-dark)';
-    
-    // Show visual feedback for mobile
-    if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-      showMobileVoiceFeedback();
-    }
-  });
-  
-  voiceBtnElement.addEventListener('mouseup', () => {
-    if (recognition && recognition.ongoing) {
-      recognition.stop();
-    }
-    if (voiceModeActive) {
-      voiceBtnElement.innerHTML = '<i class="fas fa-microphone-alt"></i>';
-      voiceBtnElement.style.backgroundColor = 'var(--primary)';
-    }
-  });
-  
-  // For touch devices
-  voiceBtnElement.addEventListener('touchstart', (e) => {
-    if (!voiceModeActive) return;
-    e.preventDefault();
-    recognition.start();
-    voiceBtnElement.innerHTML = '<i class="fas fa-microphone-slash"></i>';
-    voiceBtnElement.style.backgroundColor = 'var(--primary-dark)';
-    showMobileVoiceFeedback();
-  });
-  
-  voiceBtnElement.addEventListener('touchend', () => {
-    if (recognition && recognition.ongoing) {
-      recognition.stop();
-    }
-    if (voiceModeActive) {
-      voiceBtnElement.innerHTML = '<i class="fas fa-microphone-alt"></i>';
-      voiceBtnElement.style.backgroundColor = 'var(--primary)';
-    }
-  });
-  
+
+  // Start recording on mousedown/touchstart
+  voiceBtn.addEventListener('mousedown', startRecording);
+  voiceBtn.addEventListener('touchstart', startRecording);
+
+  // Stop recording on mouseup/touchend
+  voiceBtn.addEventListener('mouseup', stopRecording);
+  voiceBtn.addEventListener('touchend', stopRecording);
+  voiceBtn.addEventListener('mouseleave', stopRecording);
+
   recognition.onresult = (event) => {
     const transcript = event.results[0][0].transcript;
     userMessage.value = transcript;
     
     // Auto-submit if voice mode is active
     if (voiceModeActive && transcript.trim().length > 0) {
-      setTimeout(() => sendBtn.click(), 300);
+      setTimeout(() => {
+        if (taskSelector.value) {
+          sendBtn.click();
+        }
+      }, 300);
     }
+    
+    isRecording = false;
+    updateVoiceButtonState();
   };
-  
+
   recognition.onerror = (event) => {
     console.error('Speech recognition error', event.error);
-    if (voiceModeActive) {
-      voiceBtnElement.innerHTML = '<i class="fas fa-microphone-alt"></i>';
-      voiceBtnElement.style.backgroundColor = 'var(--primary)';
-    }
+    isRecording = false;
+    updateVoiceButtonState();
     removeMobileVoiceFeedback();
-  };
-  
-  recognition.onend = () => {
-    if (voiceModeActive) {
-      voiceBtnElement.innerHTML = '<i class="fas fa-microphone-alt"></i>';
-      voiceBtnElement.style.backgroundColor = 'var(--primary)';
+    
+    // Show error to user
+    if (event.error === 'not-allowed') {
+      alert('Microphone access was denied. Please allow microphone access to use voice input.');
     }
+  };
+
+  recognition.onend = () => {
+    isRecording = false;
+    updateVoiceButtonState();
     removeMobileVoiceFeedback();
   };
   
 } else {
-  voiceBtnElement.disabled = true;
-  voiceBtnElement.title = 'Voice features not supported in this browser';
-  new bootstrap.Tooltip(voiceBtnElement);
+  voiceBtn.disabled = true;
+  voiceBtn.title = 'Voice features not supported in this browser';
+  new bootstrap.Tooltip(voiceBtn);
+}
+
+function startRecording(e) {
+  if (e.type === 'touchstart') {
+    e.preventDefault();
+  }
+  
+  if (!voiceModeActive || isRecording) return;
+  
+  try {
+    recognition.start();
+    isRecording = true;
+    updateVoiceButtonState();
+    showMobileVoiceFeedback();
+  } catch (err) {
+    console.error('Speech recognition error:', err);
+    isRecording = false;
+    updateVoiceButtonState();
+  }
+}
+
+function stopRecording() {
+  if (isRecording && recognition) {
+    recognition.stop();
+  }
+}
+
+function updateVoiceButtonState() {
+  if (isRecording) {
+    voiceBtn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
+    voiceBtn.style.backgroundColor = 'var(--primary-dark)';
+  } else if (voiceModeActive) {
+    voiceBtn.innerHTML = '<i class="fas fa-microphone-alt"></i>';
+    voiceBtn.style.backgroundColor = 'var(--primary)';
+  } else {
+    voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+    voiceBtn.style.backgroundColor = '';
+  }
 }
 
 // Function to speak the response
@@ -1072,7 +1082,14 @@ document.addEventListener('visibilitychange', () => {
     window.speechSynthesis.cancel();
   }
 });
-  
+
+// Add stop button functionality
+document.addEventListener('click', (e) => {
+  if (e.target.id === 'stopSpeechBtn' && window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+    document.getElementById('stopSpeechBtn').classList.add('d-none');
+  }
+});
 </script>
 
 </body>
