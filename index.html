@@ -511,6 +511,14 @@ let currentAiMessageDiv = null;
 let currentAiMessageContent = "";
 let controller = null;
 
+// Add conversation history array
+let conversationHistory = [
+  {
+    role: "system",
+    content: "You are a Sales and Marketing Genius for a web design business. Refer to the user as Nick."
+  }
+];
+
 // Initialize tooltips
 const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
 tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -708,6 +716,12 @@ function addMessage(sender, message, isUser = false) {
   if (!isUser) {
     lastResponse = message;
   }
+
+  // Add message to conversation history
+  conversationHistory.push({
+    role: isUser ? "user" : "assistant",
+    content: message
+  });
 }
 
 function abortOngoingRequest() {
@@ -729,6 +743,9 @@ sendBtn.addEventListener("click", async () => {
 
   // Combine main prompt + task-specific prompt to form the system prompt
   const systemPrompt = `${mainPrompt} ${taskOptions[task]}`;
+  
+  // Update system message in conversation history
+  conversationHistory[0].content = systemPrompt;
 
   addMessage("user", message, true);
   userMessage.value = "";
@@ -740,8 +757,8 @@ sendBtn.addEventListener("click", async () => {
 
   try {
     const payload = {
-      prompt: systemPrompt,
-      message: message,
+      // Send entire conversation history instead of just the last message
+      messages: conversationHistory,
       stream: false  // Force stream to false
     };
 
@@ -773,6 +790,11 @@ sendBtn.addEventListener("click", async () => {
     } else {
       console.error("Fetch error:", error);
       addMessage("ai", `Error: ${error.message}`);
+      
+      // Remove the last user message from history if there was an error
+      if (conversationHistory.length > 1 && conversationHistory[conversationHistory.length - 1].role === "user") {
+        conversationHistory.pop();
+      }
     }
   } finally {
     hideTypingIndicator();
@@ -804,10 +826,21 @@ copyBtn.addEventListener("click", () => {
   });
 });
 
-// Initial scroll to bottom
+// Add Clear Conversation button functionality
+document.getElementById('clearBtn')?.addEventListener('click', () => {
+  conversationHistory = [
+    {
+      role: "system",
+      content: "You are a Sales and Marketing Genius for a web design business. Refer to the user as Nick."
+    }
+  ];
+  chatDisplay.innerHTML = ''; // Clear the chat display
+  addMessage("ai", "Hello Nick! I'm your AI marketing assistant. How can I help you today?");
+});
+
+// Initial scroll to bottom and highlight.js initialization
 window.addEventListener('load', () => {
   scrollToBottom(true);
-  // Initialize highlight.js
   hljs.highlightAll();
 });
 
