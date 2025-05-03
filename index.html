@@ -7,8 +7,6 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Add highlight.js for code syntax highlighting -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
   <style>
     :root {
       --primary: #6366f1;
@@ -311,60 +309,6 @@
       opacity: 1;
     }
     
-    /* Code block styling */
-    .code-block {
-      position: relative;
-      margin: 0.5rem 0;
-      border-radius: 0.5rem;
-      background: #f6f8fa;
-      border: 1px solid #e1e4e8;
-      overflow: hidden;
-    }
-    
-    .code-block pre {
-      margin: 0;
-      padding: 1rem;
-      overflow-x: auto;
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 0.8rem;
-      line-height: 1.4;
-      color: #24292e;
-    }
-    
-    .code-block-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.3rem 0.5rem;
-      background: #e1e4e8;
-      color: #586069;
-      font-size: 0.75rem;
-      font-family: 'Inter', sans-serif;
-    }
-    
-    .code-block-copy-btn {
-      background: none;
-      border: none;
-      color: #586069;
-      cursor: pointer;
-      font-size: 0.7rem;
-      display: flex;
-      align-items: center;
-      gap: 0.2rem;
-      padding: 0.2rem 0.4rem;
-      border-radius: 0.25rem;
-      transition: all 0.2s ease;
-    }
-    
-    .code-block-copy-btn:hover {
-      background: rgba(255, 255, 255, 0.5);
-      color: #24292e;
-    }
-    
-    .code-block-copy-btn.copied {
-      color: var(--success);
-    }
-    
     @media (max-width: 768px) {
       body {
         padding: 0.5rem;
@@ -484,8 +428,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- Add highlight.js for code syntax highlighting -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
   
 <script>
 const taskOptions = {
@@ -493,13 +435,13 @@ const taskOptions = {
 
 "Social Media Content": "You are an expert content marketer working for a creative agency. Your task is to help Nick grow his web design business using Instagram and Facebook. Come up with 3 quality post ideas, including captions, emojis, and 5 relevant hashtags each. The tone should be friendly, professional, and speak directly to sole traders (like plumbers, gardeners, and local services). Include a variety of formats like tips, testimonials, memes, and before-and-after examples.",
 
-"Cold Message Templates": "You're a high-converting copywriter. Write 3 message templates Nick can use when reaching out to small business owners via Facebook Messenger or WhatsApp. Each message should be informal but professional, and aim to create curiosity. The goal is to book a call or get a response — not to sell everything upfront. Messages should be short, punchy, and clearly explain why Nick's offer helps the business owner grow.",
+"Cold Message Templates": "You're a high-converting copywriter. Write 3 message templates Nick can use when reaching out to small business owners via Facebook Messenger or WhatsApp. Each message should be informal but professional, and aim to create curiosity. The goal is to book a call or get a response — not to sell everything upfront. Messages should be short, punchy, and clearly explain why Nick’s offer helps the business owner grow.",
 
 "Daily Business Checklist": "Act as a success coach helping Nick grow his digital service business. Create a daily checklist of high-leverage actions that take 2 hours or less to complete. The goal is to grow visibility, attract new leads, and close clients. Include categories like: lead gen, content creation, offer refinement, and follow-up. Make it realistic, repeatable, and easy for Nick to stick to without overwhelm.",
 
-"Programmer": "Act as a high level computer programmer. You are a expert in websites and software with a strong understanding of making cyber secure scripts and programs. When returning code examples, wrap them in triple backticks (```) and specify the language for proper syntax highlighting.",
+"Programmer": "Act as a high level computer programmer. You are a expert in websites and software with a strong understanding of making cyber secure scripts and programs. ",
 
-"General Assistant": "Act as helpful personal assistant. You are a expert in websites, software development and business. When returning code examples, wrap them in triple backticks (```) and specify the language for proper syntax highlighting.",
+"General Assistant": "Act as helpful personal assistant. You are a expert in websites, software development and business. ",
 
 "Wellbeing & Balance": "You are a wellness consultant who specializes in personal wellbeing. Nick sells websites, he spends a lot of time on the computer screen, he likes to ride his bike and keep fit with martial arts, Thai boxing, and yoga. He works alone and often gets stressed by overworking and the anxiety of running a business. Give him daily tips and small actions he can take, and recommend healthy foods. Wish him good luck and success in his business."
 };
@@ -510,14 +452,6 @@ let isTyping = false;
 let currentAiMessageDiv = null;
 let currentAiMessageContent = "";
 let controller = null;
-
-// Add conversation history array
-let conversationHistory = [
-  {
-    role: "system",
-    content: "You are a Sales and Marketing Genius for a web design business. Refer to the user as Nick."
-  }
-];
 
 // Initialize tooltips
 const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
@@ -597,85 +531,6 @@ function getCurrentTime() {
   return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
-function createCodeBlock(code, language = '') {
-  const codeBlock = document.createElement('div');
-  codeBlock.className = 'code-block';
-  
-  const header = document.createElement('div');
-  header.className = 'code-block-header';
-  
-  const langSpan = document.createElement('span');
-  langSpan.textContent = language || 'code';
-  
-  const copyBtn = document.createElement('button');
-  copyBtn.className = 'code-block-copy-btn';
-  copyBtn.innerHTML = '<i class="far fa-copy"></i> Copy';
-  
-  header.appendChild(langSpan);
-  header.appendChild(copyBtn);
-  
-  const pre = document.createElement('pre');
-  const codeEl = document.createElement('code');
-  codeEl.className = language ? `language-${language}` : '';
-  codeEl.textContent = code;
-  pre.appendChild(codeEl);
-  
-  codeBlock.appendChild(header);
-  codeBlock.appendChild(pre);
-  
-  // Add copy functionality
-  copyBtn.addEventListener('click', () => {
-    navigator.clipboard.writeText(code).then(() => {
-      copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-      copyBtn.classList.add('copied');
-      setTimeout(() => {
-        copyBtn.innerHTML = '<i class="far fa-copy"></i> Copy';
-        copyBtn.classList.remove('copied');
-      }, 2000);
-    });
-  });
-  
-  return codeBlock;
-}
-
-function processMessageContent(content) {
-  // Create a temporary div to hold the content
-  const tempDiv = document.createElement('div');
-  
-  // First, handle code blocks with triple backticks
-  const codeBlockRegex = /```(\w*)\n([\s\S]*?)\n```/g;
-  let lastIndex = 0;
-  let match;
-  let result = '';
-  
-  while ((match = codeBlockRegex.exec(content)) !== null) {
-    // Add text before the code block
-    if (match.index > lastIndex) {
-      const textBefore = content.substring(lastIndex, match.index);
-      const textNode = document.createElement('div');
-      textNode.innerHTML = textBefore;
-      tempDiv.appendChild(textNode);
-    }
-    
-    // Add the code block
-    const language = match[1];
-    const code = match[2];
-    tempDiv.appendChild(createCodeBlock(code, language));
-    
-    lastIndex = codeBlockRegex.lastIndex;
-  }
-  
-  // Add any remaining text after the last code block
-  if (lastIndex < content.length) {
-    const textAfter = content.substring(lastIndex);
-    const textNode = document.createElement('div');
-    textNode.innerHTML = textAfter;
-    tempDiv.appendChild(textNode);
-  }
-  
-  return tempDiv;
-}
-
 function addMessage(sender, message, isUser = false) {
   const messageDiv = document.createElement("div");
   messageDiv.className = `message ${isUser ? 'message-user' : 'message-ai'}`;
@@ -683,45 +538,20 @@ function addMessage(sender, message, isUser = false) {
   const senderName = isUser ? 'Nick' : 'Maverick';
   const senderIcon = isUser ? 'fas fa-user' : 'fas fa-robot';
 
-  const messageContent = document.createElement("div");
-  messageContent.className = "message-content";
-  
-  const senderDiv = document.createElement("div");
-  senderDiv.className = "message-sender";
-  senderDiv.innerHTML = `<i class="${senderIcon}"></i><span>${senderName}</span>`;
-  
-  messageDiv.appendChild(senderDiv);
-  
-  // Process the message content to handle code blocks
-  const processedContent = processMessageContent(message);
-  messageContent.appendChild(processedContent);
-  
-  messageDiv.appendChild(messageContent);
-  
-  const timeDiv = document.createElement("div");
-  timeDiv.className = "message-time";
-  timeDiv.textContent = getCurrentTime();
-  messageDiv.appendChild(timeDiv);
+  messageDiv.innerHTML = `
+    <div class="message-sender">
+      <i class="${senderIcon}"></i>
+      <span>${senderName}</span>
+    </div>
+    <div>${message}</div>
+    <div class="message-time">${getCurrentTime()}</div>`;
 
   chatDisplay.appendChild(messageDiv);
   scrollToBottom();
 
-  // Highlight any code blocks in the message
-  if (!isUser) {
-    document.querySelectorAll('pre code').forEach((block) => {
-      hljs.highlightElement(block);
-    });
-  }
-
   if (!isUser) {
     lastResponse = message;
   }
-
-  // Add message to conversation history
-  conversationHistory.push({
-    role: isUser ? "user" : "assistant",
-    content: message
-  });
 }
 
 function abortOngoingRequest() {
@@ -743,9 +573,6 @@ sendBtn.addEventListener("click", async () => {
 
   // Combine main prompt + task-specific prompt to form the system prompt
   const systemPrompt = `${mainPrompt} ${taskOptions[task]}`;
-  
-  // Update system message in conversation history
-  conversationHistory[0].content = systemPrompt;
 
   addMessage("user", message, true);
   userMessage.value = "";
@@ -757,8 +584,8 @@ sendBtn.addEventListener("click", async () => {
 
   try {
     const payload = {
-      // Send entire conversation history instead of just the last message
-      messages: conversationHistory,
+      prompt: systemPrompt,
+      message: message,
       stream: false  // Force stream to false
     };
 
@@ -790,11 +617,6 @@ sendBtn.addEventListener("click", async () => {
     } else {
       console.error("Fetch error:", error);
       addMessage("ai", `Error: ${error.message}`);
-      
-      // Remove the last user message from history if there was an error
-      if (conversationHistory.length > 1 && conversationHistory[conversationHistory.length - 1].role === "user") {
-        conversationHistory.pop();
-      }
     }
   } finally {
     hideTypingIndicator();
@@ -826,22 +648,9 @@ copyBtn.addEventListener("click", () => {
   });
 });
 
-// Add Clear Conversation button functionality
-document.getElementById('clearBtn')?.addEventListener('click', () => {
-  conversationHistory = [
-    {
-      role: "system",
-      content: "You are a Sales and Marketing Genius for a web design business. Refer to the user as Nick."
-    }
-  ];
-  chatDisplay.innerHTML = ''; // Clear the chat display
-  addMessage("ai", "Hello Nick! I'm your AI marketing assistant. How can I help you today?");
-});
-
-// Initial scroll to bottom and highlight.js initialization
+// Initial scroll to bottom
 window.addEventListener('load', () => {
   scrollToBottom(true);
-  hljs.highlightAll();
 });
 
 window.addEventListener('beforeunload', () => {
