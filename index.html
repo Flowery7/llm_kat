@@ -510,6 +510,29 @@ jumpToBottomBtn.addEventListener('click', () => {
   scrollToBottom(true);
 });
 
+
+
+
+function formatResponseText(text) {
+  let formatted = text
+    .replace(/## (.+)/g, '<h3>$1</h3>')
+    .replace(/\n\* (.+)/g, '<li>$1</li>')
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'); // Bold text
+
+  if (formatted.includes("<li>")) {
+    formatted = formatted.replace(/(<li>.*?<\/li>)/gms, "<ul>$1</ul>");
+    formatted = formatted.replace(/<\/ul>\s*<ul>/g, "");
+  }
+
+  return formatted;
+}
+
+
+
+
+  
 function showTypingIndicator() {
   if (isTyping) return;
   isTyping = true;
