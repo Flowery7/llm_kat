@@ -435,7 +435,7 @@ const taskOptions = {
 
 "Social Media Content": "You are an expert content marketer working for a creative agency. Your task is to help Nick grow his web design business using Instagram and Facebook. Come up with 3 quality post ideas, including captions, emojis, and 5 relevant hashtags each. The tone should be friendly, professional, and speak directly to sole traders (like plumbers, gardeners, and local services). Include a variety of formats like tips, testimonials, memes, and before-and-after examples.",
 
-"Cold Message Templates": "You're a high-converting copywriter. Write 3 message templates Nick can use when reaching out to small business owners via Facebook Messenger or WhatsApp. Each message should be informal but professional, and aim to create curiosity. The goal is to book a call or get a response — not to sell everything upfront. Messages should be short, punchy, and clearly explain why Nick’s offer helps the business owner grow.",
+"Cold Message Templates": "You're a high-converting copywriter. Write 3 message templates Nick can use when reaching out to small business owners via Facebook Messenger or WhatsApp. Each message should be informal but professional, and aim to create curiosity. The goal is to book a call or get a response — not to sell everything upfront. Messages should be short, punchy, and clearly explain why Nick's offer helps the business owner grow.",
 
 "Daily Business Checklist": "Act as a success coach helping Nick grow his digital service business. Create a daily checklist of high-leverage actions that take 2 hours or less to complete. The goal is to grow visibility, attract new leads, and close clients. Include categories like: lead gen, content creation, offer refinement, and follow-up. Make it realistic, repeatable, and easy for Nick to stick to without overwhelm.",
 
@@ -452,6 +452,7 @@ let isTyping = false;
 let currentAiMessageDiv = null;
 let currentAiMessageContent = "";
 let controller = null;
+let chatHistory = []; // Array to store chat history
 
 // Initialize tooltips
 const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
@@ -510,6 +511,11 @@ jumpToBottomBtn.addEventListener('click', () => {
   scrollToBottom(true);
 });
 
+function formatMessageWithMarkdown(message) {
+  // Convert **text** to <strong>text</strong>
+  return message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+}
+
 function showTypingIndicator() {
   if (isTyping) return;
   isTyping = true;
@@ -538,20 +544,40 @@ function addMessage(sender, message, isUser = false) {
   const senderName = isUser ? 'Nick' : 'Maverick';
   const senderIcon = isUser ? 'fas fa-user' : 'fas fa-robot';
 
+  // Format message with markdown
+  const formattedMessage = formatMessageWithMarkdown(message);
+
   messageDiv.innerHTML = `
     <div class="message-sender">
       <i class="${senderIcon}"></i>
       <span>${senderName}</span>
     </div>
-    <div>${message}</div>
+    <div>${formattedMessage}</div>
     <div class="message-time">${getCurrentTime()}</div>`;
 
   chatDisplay.appendChild(messageDiv);
   scrollToBottom();
 
-  if (!isUser) {
+  // Add to chat history (truncate if too long)
+  if (isUser) {
+    chatHistory.push({ role: 'user', content: message });
+  } else {
     lastResponse = message;
+    chatHistory.push({ role: 'assistant', content: message });
   }
+
+  // Keep only the last 4 messages (2 exchanges) to avoid too much context
+  if (chatHistory.length > 4) {
+    chatHistory = chatHistory.slice(-4);
+  }
+}
+
+function getChatHistoryContext() {
+  if (chatHistory.length === 0) return '';
+  
+  return chatHistory.map(msg => {
+    return `${msg.role === 'user' ? 'Nick' : 'Maverick'}: ${msg.content}`;
+  }).join('\n');
 }
 
 function abortOngoingRequest() {
@@ -573,6 +599,8 @@ sendBtn.addEventListener("click", async () => {
 
   // Combine main prompt + task-specific prompt to form the system prompt
   const systemPrompt = `${mainPrompt} ${taskOptions[task]}`;
+  // Get recent chat history for context
+  const historyContext = getChatHistoryContext();
 
   addMessage("user", message, true);
   userMessage.value = "";
@@ -586,6 +614,7 @@ sendBtn.addEventListener("click", async () => {
     const payload = {
       prompt: systemPrompt,
       message: message,
+      history: historyContext, // Add chat history context
       stream: false  // Force stream to false
     };
 
